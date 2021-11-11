@@ -2,11 +2,12 @@ from datetime import datetime
 from uuid import UUID
 
 from pydantic import BaseModel
+from pydantic import constr
 
 
 class UserCreate(BaseModel):
-    username: str
-    password: str
+    username: constr(min_length=1)
+    password: constr(min_length=1)
     is_admin: bool = False
 
 

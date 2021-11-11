@@ -28,5 +28,4 @@ class SQLAlchemyUserRepository(UserRepository):
         user_to_save.dt_created = user.dt_created
         user_to_save.dt_deleted = user.dt_deleted
         user_to_save.is_admin = user.is_admin
-
         return save(db_session=db_session, obj=user_to_save)

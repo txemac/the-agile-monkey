@@ -7,6 +7,7 @@ from alembic.command import downgrade
 from alembic.command import upgrade
 from alembic.config import Config
 from sqlalchemy import create_engine
+from sqlalchemy.engine import Engine
 from sqlalchemy.orm import Session
 from sqlalchemy_utils import create_database
 from sqlalchemy_utils import database_exists
@@ -20,11 +21,11 @@ _db_conn = create_engine(os.getenv("DATABASE_URL"))
 
 @pytest.fixture
 def client(
-    db: Session,
+        db_session: Session,
 ) -> Generator[TestClient, Any, None]:
     def _get_test_db():
         try:
-            yield db
+            yield db_session
         finally:
             pass
 
@@ -42,7 +43,9 @@ def engine():
 
 
 @pytest.fixture(scope='session')
-def migrations(engine):
+def migrations(
+        engine: Engine,
+) -> None:
     root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     alembic_ini = os.path.join(root_dir, 'alembic.ini')
     config = Config(alembic_ini)
@@ -52,7 +55,10 @@ def migrations(engine):
 
 
 @pytest.fixture
-def db_session(engine, migrations) -> Generator[Session, Any, None]:
+def db_session(
+        engine: Engine,
+        migrations: None,
+) -> Generator[Session, Any, None]:
     connection = engine.connect()
     transaction = connection.begin()
     session = Session(bind=connection)
@@ -62,9 +68,3 @@ def db_session(engine, migrations) -> Generator[Session, Any, None]:
     session.close()
     transaction.rollback()
     connection.close()
-
-
-@pytest.fixture
-def client():
-    with TestClient(app) as client:
-        yield client

@@ -3,17 +3,16 @@ from typing import Dict
 
 from fastapi import FastAPI
 
-from database import Base
-from database import engine
-from main_schema import Health
-
-Base.metadata.create_all(bind=engine)
+from main_schema import SchemaHealth
+from user.infrastructure.views.views import api_users
 
 
 def create_app() -> FastAPI:
     api = FastAPI(
         title="The CRM service API",
     )
+
+    api.include_router(api_users, prefix='/users', tags=['Users'])
 
     return api
 
@@ -24,7 +23,7 @@ app = create_app()
 @app.get(
     path="/health",
     status_code=HTTPStatus.OK,
-    response_model=Health,
+    response_model=SchemaHealth,
     tags=['Health'],
 )
 def get_check() -> Dict:

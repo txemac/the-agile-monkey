@@ -33,7 +33,7 @@ def save(
     try:
         db_session.commit()
         db_session.refresh(obj)
-        return obj.id
+        return True
     except Exception as e:
         print(str(e))
         db_session.rollback()
