@@ -59,3 +59,31 @@ What we are evaluating in this test:
     - The project is ready for Continuous Deployment using a provider (e.g. AWS).
     - The project uses Docker, Vagrant or other tools to make it easier to configure development environments.
 
+## Run
+
+Set environment variable:
+
+```shell script
+export DATABASE_URL=<postgres URL>
+```
+
+### Terminal with virtual env
+
+If you want to run the app in a terminal, write:
+
+```shell script
+cd src
+uvicorn main:app --reload --workers 1 --host 0.0.0.0 --port 8000
+```
+
+Test:
+
+```shell script
+pytest -vvv
+```
+
+Check the API with http://127.0.0.1:8000/health
+
+## Documentation
+
+http://127.0.0.1:8000/docs

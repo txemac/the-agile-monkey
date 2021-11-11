@@ -10,6 +10,17 @@ jobs:
       matrix:
         python-version: [ 3.9 ]
 
+    services:
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: database_test
+        ports:
+          - 5432:5432
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+
     steps:
       - uses: actions/checkout@v2
       - name: Set up Python ${{ matrix.python-version }}
@@ -36,6 +47,8 @@ jobs:
           # exit-zero treats all errors as warnings. The GitHub editor is 128 chars wide
           flake8 . --count --exit-zero --max-complexity=10 --max-line-length=128 --statistics
       - name: Test with pytest
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/database_test
         run: |
           # Run the tests
           export PYTHONPATH=${PYTHONPATH}:src
