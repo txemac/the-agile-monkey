@@ -10,8 +10,8 @@ from sqlalchemy.orm import Session
 import messages
 from database import get_db
 from depends import di_user_repository
-from user.application.user_schema import UserCreate
 from user.domain.user import User
+from user.domain.user import UserCreate
 from user.domain.user_repository import UserRepository
 
 api_users = APIRouter()

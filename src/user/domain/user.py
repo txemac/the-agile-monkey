@@ -1,16 +1,20 @@
-from dataclasses import dataclass
 from datetime import datetime
 from uuid import UUID
 
+from pydantic import BaseModel
+from pydantic import constr
 
-@dataclass
-class User:
+
+class UserCreate(BaseModel):
+    username: constr(min_length=1)
+    password: constr(min_length=1)
+    is_admin: bool = False
+
+
+class User(UserCreate):
     id: UUID
-    username: str
-    password: str
     dt_created: datetime
-    is_admin: bool
     dt_deleted: datetime = None
 
-    def __str__(self) -> str:
-        return self.username
+    class Config:
+        orm_mode = True
