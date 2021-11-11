@@ -82,6 +82,20 @@ Test:
 pytest -vvv
 ```
 
+### Docker
+
+Run:
+
+```shell script
+make run
+```
+
+Stop:
+
+```shell script
+make stop
+```
+
 Check the API with http://127.0.0.1:8000/health
 
 ## Documentation
