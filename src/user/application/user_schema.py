@@ -1,5 +1,4 @@
 from datetime import datetime
-from typing import Optional
 from uuid import UUID
 
 from pydantic import BaseModel
@@ -8,7 +7,7 @@ from pydantic import BaseModel
 class UserCreate(BaseModel):
     username: str
     password: str
-    is_admin: Optional[bool]
+    is_admin: bool = False
 
 
 class UserDB(UserCreate):

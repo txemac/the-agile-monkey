@@ -15,8 +15,7 @@ from starlette.testclient import TestClient
 from database import get_db
 from main import app
 
-url = f'{os.getenv("DATABASE_URL")}_test'
-_db_conn = create_engine(url)
+_db_conn = create_engine(os.getenv("DATABASE_URL"))
 
 
 @pytest.fixture
@@ -36,7 +35,7 @@ def client(
 
 @pytest.fixture(scope='session')
 def engine():
-    engine = create_engine(url)
+    engine = create_engine(os.getenv("DATABASE_URL"))
     if not database_exists(engine.url):
         create_database(engine.url)
     return engine
