@@ -4,6 +4,11 @@ from typing import Dict
 import uvicorn
 from fastapi import FastAPI
 
+from database import Base
+from database import engine
+
+Base.metadata.create_all(bind=engine)
+
 
 def create_app() -> FastAPI:
     api = FastAPI(
