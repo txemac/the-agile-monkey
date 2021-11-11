@@ -69,6 +69,14 @@ export DATABASE_URL=<postgres URL>
 
 ### Terminal with virtual env
 
+#### migrations
+
+Upgrade the migrations at database:
+
+```shell script
+alembic upgrade head
+```
+
 If you want to run the app in a terminal, write:
 
 ```shell script
