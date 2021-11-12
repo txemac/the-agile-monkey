@@ -65,6 +65,7 @@ Set environment variable:
 
 ```shell script
 export DATABASE_URL=<postgres URL>
+export SECRET_KEY=<your_secret_key_test>
 ```
 
 ### Terminal with virtual env

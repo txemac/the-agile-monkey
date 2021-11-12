@@ -9,6 +9,7 @@ services:
       - 8000:8000
     environment:
       - DATABASE_URL=postgresql://postgres:postgres@db/database
+      - SECRET_KEY=secret_key_test
     depends_on:
       - db
 
