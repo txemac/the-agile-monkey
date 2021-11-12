@@ -186,3 +186,38 @@ def test_user_update_without_permissions(
     )
     assert response.status_code == HTTPStatus.FORBIDDEN
     assert response.json()["detail"] == messages.USER_NOT_PERMISSION
+
+
+def test_user_delete_ok(
+        client: TestClient,
+        user_admin_headers: Dict,
+        db_session: Session,
+        user_repository: UserRepository,
+        user_1: User,
+) -> None:
+    count_1 = user_repository.count(db_session)
+    response = client.delete(
+        url=f"/users/{user_1.id}",
+        headers=user_admin_headers,
+    )
+    assert response.status_code == HTTPStatus.NO_CONTENT
+    count_2 = user_repository.count(db_session)
+    assert count_1 == count_2
+
+    user_db = user_repository.get_by_id(db_session, user_id=user_1.id)
+    assert user_db.dt_deleted is not None
+
+
+def test_user_delete_without_permissions(
+        client: TestClient,
+        user_1_headers: Dict,
+        db_session: Session,
+        user_repository: UserRepository,
+        user_1: User,
+) -> None:
+    response = client.delete(
+        url=f"/users/{user_1.id}",
+        headers=user_1_headers,
+    )
+    assert response.status_code == HTTPStatus.FORBIDDEN
+    assert response.json()["detail"] == messages.USER_NOT_PERMISSION
