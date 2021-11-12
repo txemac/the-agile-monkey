@@ -3,6 +3,7 @@ from typing import Dict
 
 from fastapi import FastAPI
 
+from customer.infrastructure.views.customer_views import api_customer
 from main_schema import SchemaHealth
 from user.infrastructure.views.auth_views import api_auth
 from user.infrastructure.views.user_views import api_users
@@ -15,6 +16,7 @@ def create_app() -> FastAPI:
 
     api.include_router(api_auth, prefix="/auth", tags=["Auth"])
     api.include_router(api_users, prefix="/users", tags=["Users"])
+    api.include_router(api_customer, prefix="/customers", tags=["Customers"])
 
     return api
 

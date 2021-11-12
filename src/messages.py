@@ -1,3 +1,5 @@
+CUSTOMER_CREATE_ERROR = "Error creating the new customer."
+CUSTOMER_ID_ALREADY_EXISTS = "The customer ID already exists."
 USER_CREATE_ERROR = "Error creating the new user."
 USER_INCORRECT_USERNAME_PASSWORD = "Incorrect username or password."
 USER_NOT_FOUND = "User not found."

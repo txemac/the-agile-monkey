@@ -1,5 +1,4 @@
 from http import HTTPStatus
-from typing import Optional
 from uuid import UUID
 
 from fastapi import Depends
@@ -14,30 +13,12 @@ import messages
 import settings
 from database import get_db
 from dependency_injection import di_user_repository
+from depends import str_to_uuid
 from user.domain.auth import AuthTokenPayload
 from user.domain.user import User
 from user.domain.user_repository import UserRepository
 
 reusable_oauth2 = OAuth2PasswordBearer(tokenUrl="/auth/token")
-
-
-def str_to_uuid(
-        uuid: str,
-) -> Optional[UUID]:
-    """
-    Check is a str is a valid UUID.
-    Return UUID or error.
-
-    :param uuid: string
-    :return: UUID
-    """
-    if uuid is None:
-        return None
-    try:
-        result = UUID(str(uuid))
-    except ValueError:
-        raise HTTPException(status_code=HTTPStatus.BAD_REQUEST, detail=messages.UUID_NOT_VALID)
-    return result
 
 
 def get_user_by_id(
