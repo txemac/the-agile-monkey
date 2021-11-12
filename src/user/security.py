@@ -26,7 +26,7 @@ def create_access_token(
 
 def verify_password(
         plain_password: str,
-        hashed_password: str
+        hashed_password: str,
 ) -> bool:
     """
     Check the password.
@@ -39,7 +39,7 @@ def verify_password(
 
 
 def get_password_hash(
-        password: str
+        password: str,
 ) -> str:
     """
     Generate a hashed password.

@@ -4,7 +4,8 @@ from typing import Dict
 from fastapi import FastAPI
 
 from main_schema import SchemaHealth
-from user.infrastructure.views.views import api_users
+from user.infrastructure.views.auth_views import api_auth
+from user.infrastructure.views.user_views import api_users
 
 
 def create_app() -> FastAPI:
@@ -12,7 +13,8 @@ def create_app() -> FastAPI:
         title="The CRM service API",
     )
 
-    api.include_router(api_users, prefix='/users', tags=['Users'])
+    api.include_router(api_auth, prefix="/auth", tags=["Auth"])
+    api.include_router(api_users, prefix="/users", tags=["Users"])
 
     return api
 
@@ -24,7 +26,7 @@ app = create_app()
     path="/health",
     status_code=HTTPStatus.OK,
     response_model=SchemaHealth,
-    tags=['Health'],
+    tags=["Health"],
 )
 def get_check() -> Dict:
     return dict(status="OK")
