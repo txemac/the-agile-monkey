@@ -102,6 +102,7 @@ class UserRepository(ABC):
         """
         Searches for a persisted users. Include myself.
         With the filter only_users you can search only users or all (users and admins).
+        With the filter only_actives you can search only users actives or all.
 
         :param db_session: session of the database
         :param only_users: filter

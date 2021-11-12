@@ -30,3 +30,11 @@ class Customer(CustomerCreate):
                 dt_deleted=None,
             )
         )
+
+
+class CustomerUpdate(BaseModel):
+    id: Optional[constr(min_length=1)] = None
+    name: Optional[constr(min_length=1)] = None
+    surname: Optional[constr(min_length=1)] = None
+    photo_url: Optional[str] = None
+    dt_deleted: Optional[datetime] = None

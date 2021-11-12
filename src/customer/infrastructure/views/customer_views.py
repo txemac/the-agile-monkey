@@ -1,5 +1,7 @@
 from datetime import datetime
 from http import HTTPStatus
+from typing import List
+from typing import Optional
 
 from fastapi import APIRouter
 from fastapi import Depends
@@ -64,3 +66,26 @@ def get_one(
         customer_db: Customer = Depends(get_customer_by_id),
 ) -> Customer:
     return customer_db
+
+
+@api_customers.get(
+    path="",
+    description="List all customers.",
+    response_model=List[Customer],
+    status_code=HTTPStatus.OK,
+    responses={
+        HTTPStatus.BAD_REQUEST: {"description": messages.USERNAME_ALREADY_EXISTS},
+        HTTPStatus.UNAUTHORIZED: {"description": messages.USER_NOT_CREDENTIALS},
+        HTTPStatus.FORBIDDEN: {"description": messages.USER_NOT_PERMISSION},
+    },
+)
+def get_list(
+        *,
+        db_session: Session = Depends(get_db),
+        customer_repository: CustomerRepository = Depends(di_customer_repository),
+        only_actives: Optional[bool] = True,
+) -> List[Customer]:
+    return customer_repository.get_list(
+        db_session=db_session,
+        only_actives=only_actives,
+    )
