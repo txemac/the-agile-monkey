@@ -62,13 +62,13 @@ def get_current_user(
         raise HTTPException(status_code=HTTPStatus.UNAUTHORIZED, detail=messages.USER_NOT_CREDENTIALS)
 
     user_db = user_repository.get_by_username(db_session=db_session, username=token_data.sub)
-    if not user_db or not user_db.dt_deleted:
+    if not user_db or user_db.dt_deleted:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail=messages.USER_NOT_FOUND)
 
     return user_db
 
 
-def user_admin_permissions(
+def check_current_user_is_admin(
         current_user: User = Depends(get_current_user)
 ) -> None:
     """

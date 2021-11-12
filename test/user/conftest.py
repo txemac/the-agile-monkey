@@ -49,10 +49,14 @@ def user_1(
 
 
 @pytest.fixture
-def admin_token_headers(
+def user_admin_headers(
         user_admin: User,
 ) -> Dict[str, str]:
-    headers = dict(
-        Authorization=f"Bearer {create_access_token(username=user_admin.username)}",
-    )
-    return headers
+    return dict(Authorization=f"Bearer {create_access_token(username=user_admin.username)}")
+
+
+@pytest.fixture
+def user_1_headers(
+        user_1: User,
+) -> Dict[str, str]:
+    return dict(Authorization=f"Bearer {create_access_token(username=user_1.username)}")

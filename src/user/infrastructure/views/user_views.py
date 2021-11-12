@@ -11,6 +11,7 @@ import messages
 from database import get_db
 from dependency_injection import di_user_repository
 from main_schema import SchemaID
+from user.depends import check_current_user_is_admin
 from user.domain.user import User
 from user.domain.user import UserCreate
 from user.domain.user_repository import UserRepository
@@ -20,11 +21,13 @@ api_users = APIRouter()
 
 @api_users.post(
     path="",
+    description="Create a new user. Only for admins.",
     status_code=HTTPStatus.CREATED,
     response_model=SchemaID,
     responses={
         HTTPStatus.BAD_REQUEST: {"description": messages.USERNAME_ALREADY_EXISTS},
     },
+    dependencies=[Depends(check_current_user_is_admin)]
 )
 def create(
         *,
