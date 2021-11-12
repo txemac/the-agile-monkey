@@ -75,5 +75,10 @@ def get_list(
         db_session: Session = Depends(get_db),
         user_repository: UserRepository = Depends(di_user_repository),
         only_users: Optional[bool] = True,
+        only_actives: Optional[bool] = True,
 ) -> List[User]:
-    return user_repository.get_list(db_session=db_session, only_users=only_users)
+    return user_repository.get_list(
+        db_session=db_session,
+        only_users=only_users,
+        only_actives=only_actives,
+    )

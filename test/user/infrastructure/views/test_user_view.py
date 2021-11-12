@@ -1,3 +1,4 @@
+from datetime import datetime
 from http import HTTPStatus
 from typing import Dict
 
@@ -6,6 +7,7 @@ from starlette.testclient import TestClient
 
 import messages
 from user.domain.user import User
+from user.domain.user import UserUpdate
 from user.domain.user_repository import UserRepository
 from utils import assert_lists
 
@@ -86,6 +88,24 @@ def test_user_get_list_only_users(
     )
     assert response.status_code == HTTPStatus.OK
     expected = [user_1.dict(exclude={"password"})]
+    assert_lists(original=response.json(), expected=expected)
+
+
+def test_user_get_list_only_actives(
+        client: TestClient,
+        user_admin_headers: Dict,
+        db_session: Session,
+        user_repository: UserRepository,
+        user_admin: User,
+        user_1: User,
+) -> None:
+    user_repository.update(db_session, user_id=user_1.id, new_info=UserUpdate(dt_deleted=datetime.utcnow()))
+    response = client.get(
+        url="/users?only_users=false&only_actives=true",
+        headers=user_admin_headers,
+    )
+    assert response.status_code == HTTPStatus.OK
+    expected = [user_admin.dict(exclude={"password"})]
     assert_lists(original=response.json(), expected=expected)
 
 

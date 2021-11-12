@@ -23,8 +23,8 @@ def get_db() -> SessionLocal:
 
 
 def save(
-    db_session: Session,
-    obj: Any,
+        db_session: Session,
+        obj: Any,
 ) -> bool:
     """
     Persist an object at database.
@@ -33,6 +33,21 @@ def save(
     try:
         db_session.commit()
         db_session.refresh(obj)
+        return True
+    except Exception as e:
+        print(str(e))
+        db_session.rollback()
+        return False
+
+
+def commit(
+        db_session: Session,
+) -> bool:
+    """
+    Commit
+    """
+    try:
+        db_session.commit()
         return True
     except Exception as e:
         print(str(e))

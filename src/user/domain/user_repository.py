@@ -2,10 +2,12 @@ from abc import ABC
 from abc import abstractmethod
 from typing import List
 from typing import Optional
+from uuid import UUID
 
 from sqlalchemy.orm import Session
 
 from user.domain.user import User
+from user.domain.user import UserUpdate
 
 
 class UserRepository(ABC):
@@ -13,8 +15,8 @@ class UserRepository(ABC):
     @classmethod
     @abstractmethod
     def count(
-        cls,
-        db_session: Session,
+            cls,
+            db_session: Session,
     ) -> int:
         """
         Count the number of element in the user table.
@@ -27,9 +29,9 @@ class UserRepository(ABC):
     @classmethod
     @abstractmethod
     def create(
-        cls,
-        db_session: Session,
-        user: User,
+            cls,
+            db_session: Session,
+            user: User,
     ) -> bool:
         """
         Persist a new User.
@@ -37,6 +39,39 @@ class UserRepository(ABC):
         :param db_session: session of the database
         :param user: User to persist
         :return: True if the record was created, False otherwise
+        """
+        pass
+
+    @classmethod
+    @abstractmethod
+    def update(
+            cls,
+            db_session: Session,
+            user_id: UUID,
+            new_info: UserUpdate,
+    ) -> None:
+        """
+        Update the info about a user.
+
+        :param db_session: session of the database
+        :param user_id: user's ID to update
+        :param new_info: new info
+        """
+        pass
+
+    @classmethod
+    @abstractmethod
+    def get_by_id(
+            cls,
+            db_session: Session,
+            user_id: UUID,
+    ) -> Optional[User]:
+        """
+        Searches for a persisted user by ID and returns it if it exists.
+
+        :param db_session: session of the database
+        :param user_id: user's ID
+        :return: user if found, None otherwise
         """
         pass
 
@@ -62,6 +97,7 @@ class UserRepository(ABC):
             cls,
             db_session: Session,
             only_users: bool = True,
+            only_actives: bool = True,
     ) -> List[User]:
         """
         Searches for a persisted users. Include myself.
@@ -69,6 +105,7 @@ class UserRepository(ABC):
 
         :param db_session: session of the database
         :param only_users: filter
+        :param only_actives: filter
         :return: users
         """
         pass

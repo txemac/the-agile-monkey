@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Optional
 from uuid import UUID
 
 from pydantic import BaseModel
@@ -29,3 +30,10 @@ class User(UserCreate):
                 is_admin=True,
             )
         )
+
+
+class UserUpdate(BaseModel):
+    username: Optional[str] = None
+    password: Optional[str] = None
+    is_admin: Optional[bool] = None
+    dt_deleted: Optional[datetime] = None
