@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 
 from customer.domain.customer import Customer
 from customer.domain.customer_repository import CustomerRepository
+from utils import assert_dicts
 
 
 def test_count_empty(
@@ -39,3 +40,19 @@ def test_create_ok(
 
     assert created is True
     assert count_1 + 1 == count_2
+
+
+def test_get_by_id_not_exists(
+        db_session: Session,
+        customer_repository: CustomerRepository,
+) -> None:
+    assert customer_repository.get_by_id(db_session=db_session, customer_id="not_exists") is None
+
+
+def test_get_by_id_ok(
+        db_session: Session,
+        customer_repository: CustomerRepository,
+        customer_1: Customer,
+) -> None:
+    result = customer_repository.get_by_id(db_session=db_session, customer_id=customer_1.id)
+    assert_dicts(original=result.__dict__, expected=customer_1.dict())

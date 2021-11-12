@@ -6,6 +6,7 @@ from starlette.testclient import TestClient
 import messages
 from customer.domain.customer import Customer
 from customer.domain.customer_repository import CustomerRepository
+from utils import assert_dicts
 
 
 def test_customer_create_ok(
@@ -47,3 +48,28 @@ def test_customer_create_id_already_exists(
     )
     assert response.status_code == HTTPStatus.BAD_REQUEST
     assert response.json()["detail"] == messages.CUSTOMER_ID_ALREADY_EXISTS
+
+
+def test_customer_get_one_ok(
+        client: TestClient,
+        db_session: Session,
+        customer_repository: CustomerRepository,
+        customer_1: Customer,
+) -> None:
+    response = client.get(
+        url=f"/customers/{customer_1.id}",
+    )
+    assert response.status_code == HTTPStatus.OK
+    assert_dicts(original=response.json(), expected=customer_1.dict())
+
+
+def test_customer_get_one_not_exists(
+        client: TestClient,
+        db_session: Session,
+        customer_repository: CustomerRepository,
+) -> None:
+    response = client.get(
+        url="/customers/not_exists",
+    )
+    assert response.status_code == HTTPStatus.NOT_FOUND
+    assert response.json()["detail"] == messages.CUSTOMER_NOT_FOUND

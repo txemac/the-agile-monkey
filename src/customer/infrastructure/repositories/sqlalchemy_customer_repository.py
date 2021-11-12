@@ -1,5 +1,4 @@
 from typing import Optional
-from uuid import UUID
 
 from sqlalchemy.orm import Session
 
@@ -37,6 +36,6 @@ class SQLAlchemyCustomerRepository(CustomerRepository):
     def get_by_id(
             cls,
             db_session: Session,
-            customer_id: UUID,
+            customer_id: str,
     ) -> Optional[Customer]:
         return db_session.query(SQLAlchemyCustomer).get(customer_id)
