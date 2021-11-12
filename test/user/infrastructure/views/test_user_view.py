@@ -283,6 +283,36 @@ def test_user_delete_ok(
     assert user_db.dt_deleted is not None
 
 
+def test_user_delete_user_id_not_exists(
+        client: TestClient,
+        user_admin_headers: Dict,
+        db_session: Session,
+        user_repository: UserRepository,
+        user_1: User,
+) -> None:
+    response = client.delete(
+        url=f"/users/{uuid4()}",
+        headers=user_admin_headers,
+    )
+    assert response.status_code == HTTPStatus.NOT_FOUND
+    assert response.json()["detail"] == messages.USER_NOT_FOUND
+
+
+def test_user_delete_user_id_not_valid(
+        client: TestClient,
+        user_admin_headers: Dict,
+        db_session: Session,
+        user_repository: UserRepository,
+        user_1: User,
+) -> None:
+    response = client.delete(
+        url="/users/not-valid",
+        headers=user_admin_headers,
+    )
+    assert response.status_code == HTTPStatus.BAD_REQUEST
+    assert response.json()["detail"] == messages.UUID_NOT_VALID
+
+
 def test_user_delete_myself(
         client: TestClient,
         user_admin_headers: Dict,

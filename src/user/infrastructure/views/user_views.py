@@ -111,7 +111,6 @@ def update(
 @api_users.delete(
     path="/{uuid}",
     description="Deactivate user. Only for admins.",
-    response_model_exclude={"password"},
     status_code=HTTPStatus.NO_CONTENT,
     responses={
         HTTPStatus.BAD_REQUEST: {"description": messages.UUID_NOT_VALID},

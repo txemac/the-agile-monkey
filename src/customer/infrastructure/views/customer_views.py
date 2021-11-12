@@ -112,3 +112,27 @@ def update(
         customer_id: str,
 ) -> None:
     return customer_repository.update(db_session, customer_id=customer_id, new_info=payload)
+
+
+@api_customers.delete(
+    path="/{customer_id}",
+    description="Deactivate a customer.",
+    status_code=HTTPStatus.NO_CONTENT,
+    responses={
+        HTTPStatus.UNAUTHORIZED: {"description": messages.USER_NOT_CREDENTIALS},
+        HTTPStatus.FORBIDDEN: {"description": messages.USER_NOT_PERMISSION},
+        HTTPStatus.NOT_FOUND: {"description": messages.CUSTOMER_NOT_FOUND},
+    },
+)
+def delete(
+        *,
+        db_session: Session = Depends(get_db),
+        customer_repository: CustomerRepository = Depends(di_customer_repository),
+        customer: Customer = Depends(get_customer_by_id),
+        customer_id: str,
+) -> None:
+    return customer_repository.update(
+        db_session=db_session,
+        customer_id=customer_id,
+        new_info=CustomerUpdate(dt_deleted=datetime.utcnow()),
+    )
