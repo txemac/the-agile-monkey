@@ -1,6 +1,7 @@
 from datetime import datetime
 from http import HTTPStatus
 from typing import Dict
+from uuid import uuid4
 
 from sqlalchemy.orm import Session
 from starlette.testclient import TestClient
@@ -170,6 +171,50 @@ def test_user_update_ok(
     data["dt_created"] = user_1.dt_created
     data["password"] = "*"
     assert_dicts(original=user_db.__dict__, expected=data)
+
+
+def test_user_update_user_id_not_exists(
+        client: TestClient,
+        user_admin_headers: Dict,
+        db_session: Session,
+        user_repository: UserRepository,
+        user_1: User,
+) -> None:
+    data = dict(
+        username="new_username",
+        password="new_password",
+        is_admin=True,
+        dt_deleted="2021-11-11T12:34:56",
+    )
+    response = client.patch(
+        url=f"/users/{uuid4()}",
+        json=data,
+        headers=user_admin_headers,
+    )
+    assert response.status_code == HTTPStatus.NOT_FOUND
+    assert response.json()["detail"] == messages.USER_NOT_FOUND
+
+
+def test_user_update_user_id_not_valid(
+        client: TestClient,
+        user_admin_headers: Dict,
+        db_session: Session,
+        user_repository: UserRepository,
+        user_1: User,
+) -> None:
+    data = dict(
+        username="new_username",
+        password="new_password",
+        is_admin=True,
+        dt_deleted="2021-11-11T12:34:56",
+    )
+    response = client.patch(
+        url="/users/not-valid",
+        json=data,
+        headers=user_admin_headers,
+    )
+    assert response.status_code == HTTPStatus.BAD_REQUEST
+    assert response.json()["detail"] == messages.UUID_NOT_VALID
 
 
 def test_user_update_myself(

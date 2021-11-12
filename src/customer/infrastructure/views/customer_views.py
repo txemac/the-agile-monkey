@@ -12,6 +12,7 @@ import messages
 from customer.depends import get_customer_by_id
 from customer.domain.customer import Customer
 from customer.domain.customer import CustomerCreate
+from customer.domain.customer import CustomerUpdate
 from customer.domain.customer_repository import CustomerRepository
 from database import get_db
 from dependency_injection import di_customer_repository
@@ -89,3 +90,25 @@ def get_list(
         db_session=db_session,
         only_actives=only_actives,
     )
+
+
+@api_customers.patch(
+    path="/{customer_id}",
+    description="Update customer.",
+    status_code=HTTPStatus.NO_CONTENT,
+    responses={
+        HTTPStatus.BAD_REQUEST: {"description": messages.UUID_NOT_VALID},
+        HTTPStatus.UNAUTHORIZED: {"description": messages.USER_NOT_CREDENTIALS},
+        HTTPStatus.FORBIDDEN: {"description": messages.USER_NOT_PERMISSION},
+        HTTPStatus.NOT_FOUND: {"description": messages.CUSTOMER_NOT_FOUND},
+    },
+)
+def update(
+        *,
+        db_session: Session = Depends(get_db),
+        customer_repository: CustomerRepository = Depends(di_customer_repository),
+        customer: Customer = Depends(get_customer_by_id),
+        payload: CustomerUpdate,
+        customer_id: str,
+) -> None:
+    return customer_repository.update(db_session, customer_id=customer_id, new_info=payload)
