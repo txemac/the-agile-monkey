@@ -172,6 +172,36 @@ def test_user_update_ok(
     assert_dicts(original=user_db.__dict__, expected=data)
 
 
+def test_user_update_myself(
+        client: TestClient,
+        user_admin_headers: Dict,
+        db_session: Session,
+        user_repository: UserRepository,
+        user_admin: User,
+) -> None:
+    count_1 = user_repository.count(db_session)
+    data = dict(
+        username="new_username",
+        password="new_password",
+        is_admin=True,
+        dt_deleted="2021-11-11T12:34:56",
+    )
+    response = client.patch(
+        url=f"/users/{user_admin.id}",
+        json=data,
+        headers=user_admin_headers,
+    )
+    assert response.status_code == HTTPStatus.NO_CONTENT
+    count_2 = user_repository.count(db_session)
+    assert count_1 == count_2
+
+    user_db = user_repository.get_by_id(db_session, user_id=user_admin.id)
+    data["id"] = str(user_admin.id)
+    data["dt_created"] = user_admin.dt_created
+    data["password"] = "*"
+    assert_dicts(original=user_db.__dict__, expected=data)
+
+
 def test_user_update_without_permissions(
         client: TestClient,
         user_1_headers: Dict,
@@ -205,6 +235,26 @@ def test_user_delete_ok(
     assert count_1 == count_2
 
     user_db = user_repository.get_by_id(db_session, user_id=user_1.id)
+    assert user_db.dt_deleted is not None
+
+
+def test_user_delete_myself(
+        client: TestClient,
+        user_admin_headers: Dict,
+        db_session: Session,
+        user_repository: UserRepository,
+        user_admin: User,
+) -> None:
+    count_1 = user_repository.count(db_session)
+    response = client.delete(
+        url=f"/users/{user_admin.id}",
+        headers=user_admin_headers,
+    )
+    assert response.status_code == HTTPStatus.NO_CONTENT
+    count_2 = user_repository.count(db_session)
+    assert count_1 == count_2
+
+    user_db = user_repository.get_by_id(db_session, user_id=user_admin.id)
     assert user_db.dt_deleted is not None
 
 
