@@ -3,6 +3,8 @@ from http import HTTPStatus
 from sqlalchemy.orm import Session
 from starlette.testclient import TestClient
 
+import messages
+from user.domain.user import User
 from user.domain.user_repository import UserRepository
 
 
@@ -24,3 +26,22 @@ def test_user_create_ok(
     assert response.status_code == HTTPStatus.CREATED
     count_2 = user_repository.count(db_session)
     assert count_1 + 1 == count_2
+
+
+def test_user_create_username_already_exists(
+        client: TestClient,
+        db_session: Session,
+        user_repository: UserRepository,
+        user_1: User,
+) -> None:
+    data = dict(
+        username=user_1.username,
+        password="password",
+        is_admin=False,
+    )
+    response = client.post(
+        url="/users",
+        json=data
+    )
+    assert response.status_code == HTTPStatus.BAD_REQUEST
+    assert response.json()["detail"] == messages.USERNAME_ALREADY_EXISTS

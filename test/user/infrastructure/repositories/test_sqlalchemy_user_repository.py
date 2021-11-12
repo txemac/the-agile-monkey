@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 
 from user.domain.user import User
 from user.domain.user_repository import UserRepository
+from utils import assert_dicts
 
 
 def test_count_empty(
@@ -39,3 +40,20 @@ def test_create_ok(
 
     assert created is True
     assert count_1 + 1 == count_2
+
+
+def test_get_by_username_ok(
+        db_session: Session,
+        user_repository: UserRepository,
+        user_1: User,
+) -> None:
+    result = user_repository.get_by_username(db_session=db_session, username=user_1.username)
+    expected = user_1.dict(exclude={"password"})
+    assert_dicts(original=result.__dict__, expected=expected)
+
+
+def test_get_by_username_not_exists(
+        db_session: Session,
+        user_repository: UserRepository,
+) -> None:
+    assert user_repository.get_by_username(db_session=db_session, username="non exists") is None
