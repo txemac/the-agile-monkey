@@ -13,10 +13,11 @@ from sqlalchemy_utils import create_database
 from sqlalchemy_utils import database_exists
 from starlette.testclient import TestClient
 
+import settings
 from database import get_db
 from main import app
 
-_db_conn = create_engine(os.getenv("DATABASE_URL"))
+_db_conn = create_engine(settings.DATABASE_URL)
 
 
 @pytest.fixture
@@ -34,24 +35,24 @@ def client(
         yield client
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope="session")
 def engine():
-    engine = create_engine(os.getenv("DATABASE_URL"))
+    engine = create_engine(settings.DATABASE_URL)
     if not database_exists(engine.url):
         create_database(engine.url)
     return engine
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope="session")
 def migrations(
         engine: Engine,
 ) -> None:
     root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    alembic_ini = os.path.join(root_dir, 'alembic.ini')
+    alembic_ini = os.path.join(root_dir, "alembic.ini")
     config = Config(alembic_ini)
-    upgrade(config, 'head')
+    upgrade(config, "head")
     yield
-    downgrade(config, 'base')
+    downgrade(config, "base")
 
 
 @pytest.fixture

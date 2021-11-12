@@ -1,4 +1,3 @@
-import uuid
 from datetime import datetime
 
 from sqlalchemy import Boolean
@@ -13,7 +12,7 @@ from database import Base
 class SQLAlchemyUser(Base):
     __tablename__ = "user"
 
-    id = Column(UUIDType, primary_key=True, default=uuid.uuid4)
+    id = Column(UUIDType, primary_key=True)
     username = Column(String, nullable=False, index=True, unique=True)
     password = Column(String, nullable=False)
     dt_created = Column(DateTime(timezone=True), default=datetime.utcnow, nullable=False)

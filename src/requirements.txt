@@ -1,6 +1,10 @@
 alembic==1.7.5
+bcrypt==3.2.0
 fastapi==0.70.0
+passlib==1.7.4
 psycopg2-binary==2.9.1
+python-jose==3.3.0
+requests==2.26.0
 SQLAlchemy==1.4.27
-uvicorn==0.15.0
 sqlalchemy_utils==0.37.9
+uvicorn==0.15.0

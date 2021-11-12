@@ -1,3 +1,5 @@
+from uuid import UUID
+
 from pydantic import BaseModel
 
 
@@ -13,7 +15,7 @@ class SchemaHealth(BaseModel):
 
 
 class SchemaID(BaseModel):
-    id: str
+    id: UUID
 
     class Config:
         schema_extra = dict(
