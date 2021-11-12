@@ -1,5 +1,7 @@
 from datetime import datetime
 from http import HTTPStatus
+from typing import List
+from typing import Optional
 from uuid import uuid4
 
 from fastapi import APIRouter
@@ -26,8 +28,10 @@ api_users = APIRouter()
     response_model=SchemaID,
     responses={
         HTTPStatus.BAD_REQUEST: {"description": messages.USERNAME_ALREADY_EXISTS},
+        HTTPStatus.UNAUTHORIZED: {"description": messages.USER_NOT_CREDENTIALS},
+        HTTPStatus.FORBIDDEN: {"description": messages.USER_NOT_PERMISSION},
     },
-    dependencies=[Depends(check_current_user_is_admin)]
+    dependencies=[Depends(check_current_user_is_admin)],
 )
 def create(
         *,
@@ -51,3 +55,25 @@ def create(
         raise HTTPException(status_code=HTTPStatus.BAD_REQUEST, detail=messages.USER_CREATE_ERROR)
 
     return SchemaID(id=new_user.id)
+
+
+@api_users.get(
+    path="",
+    description="List all users. Only for admins.",
+    response_model=List[User],
+    response_model_exclude={"password"},
+    status_code=HTTPStatus.OK,
+    responses={
+        HTTPStatus.BAD_REQUEST: {"description": messages.USERNAME_ALREADY_EXISTS},
+        HTTPStatus.UNAUTHORIZED: {"description": messages.USER_NOT_CREDENTIALS},
+        HTTPStatus.FORBIDDEN: {"description": messages.USER_NOT_PERMISSION},
+    },
+    dependencies=[Depends(check_current_user_is_admin)],
+)
+def get_list(
+        *,
+        db_session: Session = Depends(get_db),
+        user_repository: UserRepository = Depends(di_user_repository),
+        only_users: Optional[bool] = True,
+) -> List[User]:
+    return user_repository.get_list(db_session=db_session, only_users=only_users)

@@ -1,3 +1,4 @@
+from typing import List
 from typing import Optional
 
 from sqlalchemy.orm import Session
@@ -40,3 +41,16 @@ class SQLAlchemyUserRepository(UserRepository):
             username: str,
     ) -> Optional[User]:
         return db_session.query(SQLAlchemyUser).filter_by(username=username).first()
+
+    @classmethod
+    def get_list(
+            cls,
+            db_session: Session,
+            only_users: bool = True,
+    ) -> List[User]:
+        query = db_session.query(SQLAlchemyUser)
+
+        if only_users:
+            query = query.filter_by(is_admin=False)
+
+        return query.all()

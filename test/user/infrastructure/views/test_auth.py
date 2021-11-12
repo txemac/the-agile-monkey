@@ -28,7 +28,7 @@ def test_generate_token_ok(
     assert_dicts(original=response.json(), expected=expected)
 
 
-def test_generate_token_customer_not_exists(
+def test_generate_token_user_not_exists(
         client: TestClient,
 ) -> None:
     data = dict(

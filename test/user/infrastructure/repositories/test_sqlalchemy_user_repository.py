@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 from user.domain.user import User
 from user.domain.user_repository import UserRepository
 from utils import assert_dicts
+from utils import assert_lists
 
 
 def test_count_empty(
@@ -57,3 +58,34 @@ def test_get_by_username_not_exists(
         user_repository: UserRepository,
 ) -> None:
     assert user_repository.get_by_username(db_session=db_session, username="non exists") is None
+
+
+def test_get_list_empty(
+        db_session: Session,
+        user_repository: UserRepository,
+) -> None:
+    assert user_repository.get_list(db_session=db_session) == []
+
+
+def test_get_list_only_users(
+        db_session: Session,
+        user_repository: UserRepository,
+        user_admin: User,
+        user_1: User,
+) -> None:
+    result = user_repository.get_list(db_session=db_session, only_users=True)
+    original = [user.__dict__ for user in result]
+    expected = [user_1.dict(exclude={"password"})]
+    assert_lists(original=original, expected=expected)
+
+
+def test_get_list_all(
+        db_session: Session,
+        user_repository: UserRepository,
+        user_admin: User,
+        user_1: User,
+) -> None:
+    result = user_repository.get_list(db_session=db_session, only_users=False)
+    original = [user.__dict__ for user in result]
+    expected = [user_admin.dict(exclude={"password"}), user_1.dict(exclude={"password"})]
+    assert_lists(original=original, expected=expected)

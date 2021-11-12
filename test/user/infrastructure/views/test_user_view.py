@@ -7,6 +7,7 @@ from starlette.testclient import TestClient
 import messages
 from user.domain.user import User
 from user.domain.user_repository import UserRepository
+from utils import assert_lists
 
 
 def test_user_create_ok(
@@ -66,6 +67,54 @@ def test_user_create_without_permissions(
     response = client.post(
         url="/users",
         json=data,
+        headers=user_1_headers,
+    )
+    assert response.status_code == HTTPStatus.FORBIDDEN
+    assert response.json()["detail"] == messages.USER_NOT_PERMISSION
+
+
+def test_user_get_list_only_users(
+        client: TestClient,
+        user_admin_headers: Dict,
+        db_session: Session,
+        user_repository: UserRepository,
+        user_1: User,
+) -> None:
+    response = client.get(
+        url="/users",
+        headers=user_admin_headers,
+    )
+    assert response.status_code == HTTPStatus.OK
+    expected = [user_1.dict(exclude={"password"})]
+    assert_lists(original=response.json(), expected=expected)
+
+
+def test_user_get_list_all(
+        client: TestClient,
+        user_admin_headers: Dict,
+        db_session: Session,
+        user_repository: UserRepository,
+        user_admin: User,
+        user_1: User,
+) -> None:
+    response = client.get(
+        url="/users?only_users=false",
+        headers=user_admin_headers,
+    )
+    assert response.status_code == HTTPStatus.OK
+    expected = [user_admin.dict(exclude={"password"}), user_1.dict(exclude={"password"})]
+    assert_lists(original=response.json(), expected=expected)
+
+
+def test_user_get_list_without_permissions(
+        client: TestClient,
+        user_1_headers: Dict,
+        db_session: Session,
+        user_repository: UserRepository,
+        user_1: User,
+) -> None:
+    response = client.get(
+        url="/users",
         headers=user_1_headers,
     )
     assert response.status_code == HTTPStatus.FORBIDDEN

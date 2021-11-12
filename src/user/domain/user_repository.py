@@ -1,5 +1,6 @@
 from abc import ABC
 from abc import abstractmethod
+from typing import List
 from typing import Optional
 
 from sqlalchemy.orm import Session
@@ -52,5 +53,22 @@ class UserRepository(ABC):
         :param db_session: session of the database
         :param username: username
         :return: user if found, None otherwise
+        """
+        pass
+
+    @classmethod
+    @abstractmethod
+    def get_list(
+            cls,
+            db_session: Session,
+            only_users: bool = True,
+    ) -> List[User]:
+        """
+        Searches for a persisted users. Include myself.
+        With the filter only_users you can search only users or all (users and admins).
+
+        :param db_session: session of the database
+        :param only_users: filter
+        :return: users
         """
         pass
