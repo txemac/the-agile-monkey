@@ -49,6 +49,7 @@ jobs:
       - name: Test with pytest
         env:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/database_test
+          SECRET_KEY: secret_key_test
         run: |
           # Run the tests
           export PYTHONPATH=${PYTHONPATH}:src:test
