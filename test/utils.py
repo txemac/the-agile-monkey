@@ -67,4 +67,4 @@ def assert_datetime(original, expected):
     if type(expected) is not str:
         expected = datetime.isoformat(expected)
 
-    assert original[:20] == expected[:20]
+    assert original[:19] == expected[:19]

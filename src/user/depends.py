@@ -1,4 +1,6 @@
 from http import HTTPStatus
+from typing import Optional
+from uuid import UUID
 
 from fastapi import Depends
 from fastapi import HTTPException
@@ -19,22 +21,41 @@ from user.domain.user_repository import UserRepository
 reusable_oauth2 = OAuth2PasswordBearer(tokenUrl="/auth/token")
 
 
-def get_user(
+def str_to_uuid(
+        uuid: str,
+) -> Optional[UUID]:
+    """
+    Check is a str is a valid UUID.
+    Return UUID or error.
+
+    :param uuid: string
+    :return: UUID
+    """
+    if uuid is None:
+        return None
+    try:
+        result = UUID(str(uuid))
+    except ValueError:
+        raise HTTPException(status_code=HTTPStatus.BAD_REQUEST, detail=messages.UUID_NOT_VALID)
+    return result
+
+
+def get_user_by_id(
         *,
         db_session: Session = Depends(get_db),
         user_repository: UserRepository = Depends(di_user_repository),
-        username: str,
+        user_uuid: UUID = Depends(str_to_uuid),
 ) -> User:
     """
-    Get user by username.
+    Get user by user_id.
 
     :param db_session: session of the database
     :param user_repository: user repository
-    :param username: username
+    :param user_uuid: user_id str to UUID
     :raise: HTTPException if user not exists
     :return: user
     """
-    user_db = user_repository.get_by_username(db_session=db_session, username=username)
+    user_db = user_repository.get_by_id(db_session=db_session, user_id=user_uuid)
 
     if user_db is None:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail=messages.USER_NOT_FOUND)

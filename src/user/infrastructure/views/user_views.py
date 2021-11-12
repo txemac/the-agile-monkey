@@ -14,8 +14,10 @@ from database import get_db
 from dependency_injection import di_user_repository
 from main_schema import SchemaID
 from user.depends import check_current_user_is_admin
+from user.depends import get_user_by_id
 from user.domain.user import User
 from user.domain.user import UserCreate
+from user.domain.user import UserUpdate
 from user.domain.user_repository import UserRepository
 
 api_users = APIRouter()
@@ -82,3 +84,26 @@ def get_list(
         only_users=only_users,
         only_actives=only_actives,
     )
+
+
+@api_users.patch(
+    path="/{uuid}",
+    description="Update user. Only for admins.",
+    response_model_exclude={"password"},
+    status_code=HTTPStatus.NO_CONTENT,
+    responses={
+        HTTPStatus.BAD_REQUEST: {"description": messages.UUID_NOT_VALID},
+        HTTPStatus.UNAUTHORIZED: {"description": messages.USER_NOT_CREDENTIALS},
+        HTTPStatus.FORBIDDEN: {"description": messages.USER_NOT_PERMISSION},
+        HTTPStatus.NOT_FOUND: {"description": messages.USER_NOT_FOUND},
+    },
+    dependencies=[Depends(check_current_user_is_admin)],
+)
+def get_list(
+        *,
+        db_session: Session = Depends(get_db),
+        user_repository: UserRepository = Depends(di_user_repository),
+        user: User = Depends(get_user_by_id),
+        payload: UserUpdate,
+) -> None:
+    return user_repository.update(db_session, user_id=user.id, new_info=payload)

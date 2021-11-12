@@ -9,6 +9,7 @@ import messages
 from user.domain.user import User
 from user.domain.user import UserUpdate
 from user.domain.user_repository import UserRepository
+from utils import assert_dicts
 from utils import assert_lists
 
 
@@ -135,6 +136,52 @@ def test_user_get_list_without_permissions(
 ) -> None:
     response = client.get(
         url="/users",
+        headers=user_1_headers,
+    )
+    assert response.status_code == HTTPStatus.FORBIDDEN
+    assert response.json()["detail"] == messages.USER_NOT_PERMISSION
+
+
+def test_user_update_ok(
+        client: TestClient,
+        user_admin_headers: Dict,
+        db_session: Session,
+        user_repository: UserRepository,
+        user_1: User,
+) -> None:
+    count_1 = user_repository.count(db_session)
+    data = dict(
+        username="new_username",
+        password="new_password",
+        is_admin=True,
+        dt_deleted="2021-11-11T12:34:56",
+    )
+    response = client.patch(
+        url=f"/users/{user_1.id}",
+        json=data,
+        headers=user_admin_headers,
+    )
+    assert response.status_code == HTTPStatus.NO_CONTENT
+    count_2 = user_repository.count(db_session)
+    assert count_1 == count_2
+
+    user_db = user_repository.get_by_id(db_session, user_id=user_1.id)
+    data["id"] = str(user_1.id)
+    data["dt_created"] = user_1.dt_created
+    data["password"] = "*"
+    assert_dicts(original=user_db.__dict__, expected=data)
+
+
+def test_user_update_without_permissions(
+        client: TestClient,
+        user_1_headers: Dict,
+        db_session: Session,
+        user_repository: UserRepository,
+        user_1: User,
+) -> None:
+    response = client.patch(
+        url=f"/users/{user_1.id}",
+        json=dict(),
         headers=user_1_headers,
     )
     assert response.status_code == HTTPStatus.FORBIDDEN
