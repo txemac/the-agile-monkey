@@ -2,6 +2,7 @@ import os
 from typing import Any
 from typing import Dict
 from typing import Generator
+from uuid import UUID
 
 import pytest
 from alembic.command import downgrade
@@ -54,7 +55,7 @@ def migrations(
         engine: Engine,
 ) -> None:
     root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    alembic_ini = os.path.join(root_dir, "alembic.ini")
+    alembic_ini = os.path.join(root_dir, "src", "alembic.ini")
     config = Config(alembic_ini)
     upgrade(config, "head")
     yield
@@ -87,12 +88,7 @@ def user_admin(
         db_session: Session,
         user_repository: UserRepository,
 ) -> User:
-    user_admin = UserCreate(
-        username="user_admin",
-        password="password",
-        is_admin=True,
-    )
-    return user_repository.create(db_session, user=user_admin)
+    return user_repository.get_by_id(db_session, user_id=UUID("6fc330b1-3d65-402c-b7a3-b5b526240505"))
 
 
 @pytest.fixture

@@ -10,17 +10,9 @@ from utils import assert_dicts
 from utils import assert_lists
 
 
-def test_count_empty(
-        db_session: Session,
-        user_repository: UserRepository,
-) -> None:
-    assert user_repository.count(db_session) == 0
-
-
 def test_count_ok(
         db_session: Session,
         user_repository: UserRepository,
-        user_1: User,
 ) -> None:
     assert user_repository.count(db_session) == 1
 

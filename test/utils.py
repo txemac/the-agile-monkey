@@ -13,6 +13,8 @@ def assert_dicts(original, expected):
     :param Dict original: original dict
     :param Dict expected: expected dict
     """
+    original.pop("_sa_instance_state") if "_sa_instance_state" in original.keys() else None
+    expected.pop("_sa_instance_state") if "_sa_instance_state" in expected.keys() else None
     for key in expected.keys():
         assert key in original.keys(), key
         if type(original[key]) == dict:

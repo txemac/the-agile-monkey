@@ -40,7 +40,7 @@ class SQLAlchemyUserRepository(UserRepository):
         user_to_save.dt_deleted = None
         user_to_save.is_admin = user.is_admin
         created = save(db_session=db_session, obj=user_to_save)
-        return User(**user_to_save.__dict__) if created else None
+        return user_to_save if created else None
 
     @classmethod
     def update(

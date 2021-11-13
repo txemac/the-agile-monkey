@@ -41,7 +41,7 @@ class SQLAlchemyCustomerRepository(CustomerRepository):
         customer_to_save.created_by_id = current_user.id
         customer_to_save.updated_by = None
         created = save(db_session=db_session, obj=customer_to_save)
-        return Customer(**customer_to_save.__dict__) if created else None
+        return customer_to_save if created else None
 
     @classmethod
     def update(
