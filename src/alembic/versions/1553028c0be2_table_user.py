@@ -30,6 +30,15 @@ def upgrade():
     op.create_index(op.f("ix_user_id"), "user", ["id"], unique=True)
     op.create_index(op.f("ix_user_username"), "user", ["username"], unique=True)
 
+    pg_connection = op.get_bind()
+    pg_connection.execute(
+        """
+    insert into "user" (id, username, password, dt_created, dt_deleted, is_admin)
+    values ('6fc330b1-3d65-402c-b7a3-b5b526240505', 'admin',
+    '$2b$12$a/BvAPooibsSdwzkNUEjeOl7oOOdguqmoLogl9qRqTi9xsFCMKf5a', now(), null, true);
+    """
+    )
+
 
 def downgrade():
     op.drop_index(op.f("ix_user_username"), table_name="user")

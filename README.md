@@ -70,11 +70,10 @@ export SECRET_KEY=<your_secret_key_test>
 
 ### Terminal with virtual env
 
-#### migrations
-
 Upgrade the migrations at database:
 
 ```shell script
+cd src
 alembic upgrade head
 ```
 
@@ -93,10 +92,22 @@ pytest -vvv
 
 ### Docker
 
-Run:
+Build:
 
 ```shell script
-make run
+make build
+```
+
+Up:
+
+```shell script
+make up
+```
+
+Database migrate:
+
+```shell script
+make migrate-up
 ```
 
 Stop:

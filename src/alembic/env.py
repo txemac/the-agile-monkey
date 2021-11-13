@@ -17,7 +17,7 @@ fileConfig(config.config_file_name)
 # for 'autogenerate' support
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
-from src.database import Base  # noqa: E402
+from database import Base  # noqa: E402
 
 target_metadata = Base.metadata
 
