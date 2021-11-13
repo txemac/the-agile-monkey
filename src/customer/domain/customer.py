@@ -10,6 +10,7 @@ class CustomerCreate(BaseModel):
     id: constr(min_length=1)
     name: constr(min_length=1)
     surname: constr(min_length=1)
+    # photo: Optional[str] = None
     photo_url: Optional[str] = None
 
 
@@ -43,5 +44,6 @@ class CustomerUpdate(BaseModel):
     id: Optional[constr(min_length=1)] = None
     name: Optional[constr(min_length=1)] = None
     surname: Optional[constr(min_length=1)] = None
+    # photo: Optional[str] = None
     photo_url: Optional[str] = None
     dt_deleted: Optional[datetime] = None

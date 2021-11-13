@@ -14,7 +14,9 @@ import messages
 import settings
 from customer.domain.customer import Customer
 from customer.domain.customer_repository import CustomerRepository
+from customer.domain.image_storage_service import ImageStorageService
 from customer.infrastructure.repositories.sqlalchemy_customer_repository import SQLAlchemyCustomerRepository
+from customer.infrastructure.services.aws_s3_image_storage_service import AWSS3ImageStorageService
 from database import get_db
 from user.domain.auth import AuthTokenPayload
 from user.domain.user import User
@@ -28,6 +30,10 @@ def get_user_repository() -> UserRepository:
 
 def get_customer_repository() -> CustomerRepository:
     return SQLAlchemyCustomerRepository()
+
+
+def get_image_storage_service() -> ImageStorageService:
+    return AWSS3ImageStorageService()
 
 
 reusable_oauth2 = OAuth2PasswordBearer(tokenUrl="/auth/token")

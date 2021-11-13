@@ -39,6 +39,7 @@ def create(
         *,
         db_session: Session = Depends(get_db),
         customer_repository: CustomerRepository = Depends(get_customer_repository),
+        # image_storage_service: ImageStorageService = Depends(get_image_storage_service),
         current_user: User = Depends(get_current_user),
         payload: CustomerCreate,
 ) -> None:
@@ -46,6 +47,13 @@ def create(
     customer_db = customer_repository.get_by_id(db_session=db_session, customer_id=payload.id)
     if customer_db:
         raise HTTPException(status_code=HTTPStatus.BAD_REQUEST, detail=messages.CUSTOMER_ID_ALREADY_EXISTS)
+
+    # upload photo
+    # if payload.photo is not None:
+    #    photo_url = image_storage_service.update(
+    #        path=f"customer/{payload.id}/photo.png",
+    #        image=payload.photo,
+    #    )
 
     # create new customer
     new_customer = customer_repository.create(db_session=db_session, customer=payload, current_user=current_user)
@@ -112,11 +120,19 @@ def update(
         *,
         db_session: Session = Depends(get_db),
         customer_repository: CustomerRepository = Depends(get_customer_repository),
+        # image_storage_service: ImageStorageService = Depends(get_image_storage_service),
         current_user: User = Depends(get_current_user),
         customer: Customer = Depends(get_customer_by_id),
         payload: CustomerUpdate,
         customer_id: str,
 ) -> None:
+    # upload photo
+    # if payload.photo is not None:
+    #    photo_url = image_storage_service.update(
+    #        path=f"customer/{payload.id}/photo.png",
+    #        image=payload.photo,
+    #    )
+
     customer_repository.update(
         db_session=db_session,
         customer_id=customer_id,
