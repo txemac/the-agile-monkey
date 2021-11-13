@@ -7,6 +7,7 @@ from uuid import UUID
 from sqlalchemy.orm import Session
 
 from user.domain.user import User
+from user.domain.user import UserCreate
 from user.domain.user import UserUpdate
 
 
@@ -31,14 +32,14 @@ class UserRepository(ABC):
     def create(
             cls,
             db_session: Session,
-            user: User,
-    ) -> bool:
+            user: UserCreate,
+    ) -> Optional[User]:
         """
         Persist a new User.
 
         :param db_session: session of the database
         :param user: User to persist
-        :return: True if the record was created, False otherwise
+        :return: user if the record was created, None otherwise
         """
         pass
 

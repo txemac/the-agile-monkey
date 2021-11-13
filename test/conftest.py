@@ -1,5 +1,6 @@
 import os
 from typing import Any
+from typing import Dict
 from typing import Generator
 
 import pytest
@@ -16,6 +17,11 @@ from starlette.testclient import TestClient
 import settings
 from database import get_db
 from main import app
+from user.domain.user import User
+from user.domain.user import UserCreate
+from user.domain.user_repository import UserRepository
+from user.infrastructure.repositories.sqlalchemy_user_repository import SQLAlchemyUserRepository
+from user.security import create_access_token
 
 _db_conn = create_engine(settings.DATABASE_URL)
 
@@ -69,3 +75,48 @@ def db_session(
     session.close()
     transaction.rollback()
     connection.close()
+
+
+@pytest.fixture
+def user_repository() -> UserRepository:
+    return SQLAlchemyUserRepository()
+
+
+@pytest.fixture
+def user_admin(
+        db_session: Session,
+        user_repository: UserRepository,
+) -> User:
+    user_admin = UserCreate(
+        username="user_admin",
+        password="password",
+        is_admin=True,
+    )
+    return user_repository.create(db_session, user=user_admin)
+
+
+@pytest.fixture
+def user_1(
+        db_session: Session,
+        user_repository: UserRepository,
+) -> User:
+    user_1 = UserCreate(
+        username="user_1",
+        password="password",
+        is_admin=False,
+    )
+    return user_repository.create(db_session, user=user_1)
+
+
+@pytest.fixture
+def user_admin_headers(
+        user_admin: User,
+) -> Dict[str, str]:
+    return dict(Authorization=f"Bearer {create_access_token(username=user_admin.username)}")
+
+
+@pytest.fixture
+def user_1_headers(
+        user_1: User,
+) -> Dict[str, str]:
+    return dict(Authorization=f"Bearer {create_access_token(username=user_1.username)}")

@@ -15,6 +15,7 @@ class UserCreate(BaseModel):
 class User(UserCreate):
     id: UUID
     dt_created: datetime
+    dt_updated: datetime = None
     dt_deleted: datetime = None
 
     class Config:
@@ -26,6 +27,7 @@ class User(UserCreate):
                 username="monkey",
                 password="hashed password",
                 dt_created="2021-11-11 12:34:56",
+                dt_updated=None,
                 dt_deleted=None,
                 is_admin=True,
             )

@@ -1,12 +1,15 @@
+from datetime import datetime
 from typing import List
 from typing import Optional
 from uuid import UUID
+from uuid import uuid4
 
 from sqlalchemy.orm import Session
 
 from database import commit
 from database import save
 from user.domain.user import User
+from user.domain.user import UserCreate
 from user.domain.user import UserUpdate
 from user.domain.user_repository import UserRepository
 from user.infrastructure.models.sqlalchemy_user import SQLAlchemyUser
@@ -26,16 +29,18 @@ class SQLAlchemyUserRepository(UserRepository):
     def create(
             cls,
             db_session: Session,
-            user: User,
-    ) -> bool:
+            user: UserCreate,
+    ) -> Optional[User]:
         user_to_save = SQLAlchemyUser()
-        user_to_save.id = user.id
+        user_to_save.id = uuid4()
         user_to_save.username = user.username
         user_to_save.password = get_password_hash(user.password)
-        user_to_save.dt_created = user.dt_created
-        user_to_save.dt_deleted = user.dt_deleted
+        user_to_save.dt_created = datetime.utcnow()
+        user_to_save.dt_updated = None
+        user_to_save.dt_deleted = None
         user_to_save.is_admin = user.is_admin
-        return save(db_session=db_session, obj=user_to_save)
+        created = save(db_session=db_session, obj=user_to_save)
+        return User(**user_to_save.__dict__) if created else None
 
     @classmethod
     def update(
@@ -49,6 +54,7 @@ class SQLAlchemyUserRepository(UserRepository):
         user_db = cls.get_by_id(db_session, user_id=user_id)
         for key, value in new_info.dict(exclude_unset=True).items():
             setattr(user_db, key, value)
+        user_db.dt_updated = datetime.utcnow()
         commit(db_session=db_session)
 
     @classmethod

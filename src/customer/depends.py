@@ -8,13 +8,13 @@ import messages
 from customer.domain.customer import Customer
 from customer.domain.customer_repository import CustomerRepository
 from database import get_db
-from dependency_injection import di_customer_repository
+from depends import get_customer_repository
 
 
 def get_customer_by_id(
         *,
         db_session: Session = Depends(get_db),
-        customer_repository: CustomerRepository = Depends(di_customer_repository),
+        customer_repository: CustomerRepository = Depends(get_customer_repository),
         customer_id: str,
 ) -> Customer:
     """

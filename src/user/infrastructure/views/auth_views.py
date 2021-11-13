@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 
 import messages
 from database import get_db
-from dependency_injection import di_user_repository
+from depends import get_user_repository
 from user.domain.auth import AuthLogin
 from user.domain.auth import AuthToken
 from user.domain.user_repository import UserRepository
@@ -28,7 +28,7 @@ api_auth = APIRouter()
 def generate_token(
         *,
         db_session: Session = Depends(get_db),
-        user_repository: UserRepository = Depends(di_user_repository),
+        user_repository: UserRepository = Depends(get_user_repository),
         payload: AuthLogin,
 ) -> AuthToken:
     user_db = user_repository.get_by_username(db_session=db_session, username=payload.username)

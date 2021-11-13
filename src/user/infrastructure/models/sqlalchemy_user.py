@@ -16,6 +16,7 @@ class SQLAlchemyUser(Base):
     username = Column(String, nullable=False, index=True, unique=True)
     password = Column(String, nullable=False)
     dt_created = Column(DateTime(timezone=True), default=datetime.utcnow, nullable=False)
+    dt_updated = Column(DateTime(timezone=True), nullable=True)
     dt_deleted = Column(DateTime(timezone=True), nullable=True)
     is_admin = Column(Boolean, nullable=False)
 

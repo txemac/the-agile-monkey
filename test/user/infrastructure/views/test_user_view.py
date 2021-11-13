@@ -85,11 +85,13 @@ def test_user_get_list_only_users(
         user_1: User,
 ) -> None:
     response = client.get(
-        url="/users",
+        url="/users?only_users=true",
         headers=user_admin_headers,
     )
     assert response.status_code == HTTPStatus.OK
-    expected = [user_1.dict(exclude={"password"})]
+    expected = [user_1.__dict__]
+    expected[0]["dt_created"] = "*"
+    expected[0].pop("password")
     assert_lists(original=response.json(), expected=expected)
 
 
@@ -107,7 +109,9 @@ def test_user_get_list_only_actives(
         headers=user_admin_headers,
     )
     assert response.status_code == HTTPStatus.OK
-    expected = [user_admin.dict(exclude={"password"})]
+    expected = [user_admin.__dict__]
+    expected[0]["dt_created"] = "*"
+    expected[0].pop("password")
     assert_lists(original=response.json(), expected=expected)
 
 
@@ -124,7 +128,10 @@ def test_user_get_list_all(
         headers=user_admin_headers,
     )
     assert response.status_code == HTTPStatus.OK
-    expected = [user_admin.dict(exclude={"password"}), user_1.dict(exclude={"password"})]
+    expected = [user_admin.__dict__, user_1.__dict__]
+    for element in expected:
+        element["dt_created"] = "*"
+        element.pop("password")
     assert_lists(original=response.json(), expected=expected)
 
 

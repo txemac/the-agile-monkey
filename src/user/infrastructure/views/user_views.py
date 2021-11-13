@@ -2,18 +2,18 @@ from datetime import datetime
 from http import HTTPStatus
 from typing import List
 from typing import Optional
-from uuid import uuid4
 
 from fastapi import APIRouter
 from fastapi import Depends
 from fastapi import HTTPException
+from fastapi import Response
 from sqlalchemy.orm import Session
 
 import messages
 from database import get_db
-from dependency_injection import di_user_repository
+from depends import check_authenticated_is_admin
+from depends import get_user_repository
 from main_schema import SchemaID
-from user.depends import check_current_user_is_admin
 from user.depends import get_user_by_id
 from user.domain.user import User
 from user.domain.user import UserCreate
@@ -33,12 +33,12 @@ api_users = APIRouter()
         HTTPStatus.UNAUTHORIZED: {"description": messages.USER_NOT_CREDENTIALS},
         HTTPStatus.FORBIDDEN: {"description": messages.USER_NOT_PERMISSION},
     },
-    dependencies=[Depends(check_current_user_is_admin)],
+    dependencies=[Depends(check_authenticated_is_admin)],
 )
 def create(
         *,
         db_session: Session = Depends(get_db),
-        user_repository: UserRepository = Depends(di_user_repository),
+        user_repository: UserRepository = Depends(get_user_repository),
         payload: UserCreate,
 ) -> SchemaID:
     # check the unique username
@@ -47,13 +47,8 @@ def create(
         raise HTTPException(status_code=HTTPStatus.BAD_REQUEST, detail=messages.USERNAME_ALREADY_EXISTS)
 
     # create new user
-    new_user = User(
-        id=uuid4(),
-        dt_created=datetime.utcnow(),
-        **payload.dict(),
-    )
-    created = user_repository.create(db_session=db_session, user=new_user)
-    if not created:
+    new_user = user_repository.create(db_session=db_session, user=payload)
+    if not new_user:
         raise HTTPException(status_code=HTTPStatus.BAD_REQUEST, detail=messages.USER_CREATE_ERROR)
 
     return SchemaID(id=new_user.id)
@@ -70,12 +65,12 @@ def create(
         HTTPStatus.UNAUTHORIZED: {"description": messages.USER_NOT_CREDENTIALS},
         HTTPStatus.FORBIDDEN: {"description": messages.USER_NOT_PERMISSION},
     },
-    dependencies=[Depends(check_current_user_is_admin)],
+    dependencies=[Depends(check_authenticated_is_admin)],
 )
 def get_list(
         *,
         db_session: Session = Depends(get_db),
-        user_repository: UserRepository = Depends(di_user_repository),
+        user_repository: UserRepository = Depends(get_user_repository),
         only_users: Optional[bool] = True,
         only_actives: Optional[bool] = True,
 ) -> List[User]:
@@ -96,16 +91,17 @@ def get_list(
         HTTPStatus.FORBIDDEN: {"description": messages.USER_NOT_PERMISSION},
         HTTPStatus.NOT_FOUND: {"description": messages.USER_NOT_FOUND},
     },
-    dependencies=[Depends(check_current_user_is_admin)],
+    dependencies=[Depends(check_authenticated_is_admin)],
 )
 def update(
         *,
         db_session: Session = Depends(get_db),
-        user_repository: UserRepository = Depends(di_user_repository),
+        user_repository: UserRepository = Depends(get_user_repository),
         user: User = Depends(get_user_by_id),
         payload: UserUpdate,
 ) -> None:
-    return user_repository.update(db_session, user_id=user.id, new_info=payload)
+    user_repository.update(db_session, user_id=user.id, new_info=payload)
+    return Response(status_code=HTTPStatus.NO_CONTENT.value)
 
 
 @api_users.delete(
@@ -118,12 +114,13 @@ def update(
         HTTPStatus.FORBIDDEN: {"description": messages.USER_NOT_PERMISSION},
         HTTPStatus.NOT_FOUND: {"description": messages.USER_NOT_FOUND},
     },
-    dependencies=[Depends(check_current_user_is_admin)],
+    dependencies=[Depends(check_authenticated_is_admin)],
 )
 def delete(
         *,
         db_session: Session = Depends(get_db),
-        user_repository: UserRepository = Depends(di_user_repository),
+        user_repository: UserRepository = Depends(get_user_repository),
         user: User = Depends(get_user_by_id),
 ) -> None:
-    return user_repository.update(db_session, user_id=user.id, new_info=UserUpdate(dt_deleted=datetime.utcnow()))
+    user_repository.update(db_session, user_id=user.id, new_info=UserUpdate(dt_deleted=datetime.utcnow()))
+    return Response(status_code=HTTPStatus.NO_CONTENT.value)

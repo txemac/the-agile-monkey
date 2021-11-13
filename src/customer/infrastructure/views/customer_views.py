@@ -6,6 +6,7 @@ from typing import Optional
 from fastapi import APIRouter
 from fastapi import Depends
 from fastapi import HTTPException
+from fastapi import Response
 from sqlalchemy.orm import Session
 
 import messages
@@ -15,7 +16,10 @@ from customer.domain.customer import CustomerCreate
 from customer.domain.customer import CustomerUpdate
 from customer.domain.customer_repository import CustomerRepository
 from database import get_db
-from dependency_injection import di_customer_repository
+from depends import check_authenticated
+from depends import get_current_user
+from depends import get_customer_repository
+from user.domain.user import User
 
 api_customers = APIRouter()
 
@@ -29,11 +33,13 @@ api_customers = APIRouter()
         HTTPStatus.UNAUTHORIZED: {"description": messages.USER_NOT_CREDENTIALS},
         HTTPStatus.FORBIDDEN: {"description": messages.USER_NOT_PERMISSION},
     },
+    dependencies=[Depends(check_authenticated)],
 )
 def create(
         *,
         db_session: Session = Depends(get_db),
-        customer_repository: CustomerRepository = Depends(di_customer_repository),
+        customer_repository: CustomerRepository = Depends(get_customer_repository),
+        current_user: User = Depends(get_current_user),
         payload: CustomerCreate,
 ) -> None:
     # check the unique id
@@ -42,12 +48,8 @@ def create(
         raise HTTPException(status_code=HTTPStatus.BAD_REQUEST, detail=messages.CUSTOMER_ID_ALREADY_EXISTS)
 
     # create new customer
-    new_customer = Customer(
-        dt_created=datetime.utcnow(),
-        **payload.dict(),
-    )
-    created = customer_repository.create(db_session=db_session, customer=new_customer)
-    if not created:
+    new_customer = customer_repository.create(db_session=db_session, customer=payload, current_user=current_user)
+    if not new_customer:
         raise HTTPException(status_code=HTTPStatus.BAD_REQUEST, detail=messages.CUSTOMER_CREATE_ERROR)
 
 
@@ -61,6 +63,7 @@ def create(
         HTTPStatus.FORBIDDEN: {"description": messages.USER_NOT_PERMISSION},
         HTTPStatus.NOT_FOUND: {"description": messages.CUSTOMER_NOT_FOUND},
     },
+    dependencies=[Depends(check_authenticated)],
 )
 def get_one(
         *,
@@ -79,11 +82,12 @@ def get_one(
         HTTPStatus.UNAUTHORIZED: {"description": messages.USER_NOT_CREDENTIALS},
         HTTPStatus.FORBIDDEN: {"description": messages.USER_NOT_PERMISSION},
     },
+    dependencies=[Depends(check_authenticated)],
 )
 def get_list(
         *,
         db_session: Session = Depends(get_db),
-        customer_repository: CustomerRepository = Depends(di_customer_repository),
+        customer_repository: CustomerRepository = Depends(get_customer_repository),
         only_actives: Optional[bool] = True,
 ) -> List[Customer]:
     return customer_repository.get_list(
@@ -102,16 +106,24 @@ def get_list(
         HTTPStatus.FORBIDDEN: {"description": messages.USER_NOT_PERMISSION},
         HTTPStatus.NOT_FOUND: {"description": messages.CUSTOMER_NOT_FOUND},
     },
+    dependencies=[Depends(check_authenticated)],
 )
 def update(
         *,
         db_session: Session = Depends(get_db),
-        customer_repository: CustomerRepository = Depends(di_customer_repository),
+        customer_repository: CustomerRepository = Depends(get_customer_repository),
+        current_user: User = Depends(get_current_user),
         customer: Customer = Depends(get_customer_by_id),
         payload: CustomerUpdate,
         customer_id: str,
 ) -> None:
-    return customer_repository.update(db_session, customer_id=customer_id, new_info=payload)
+    customer_repository.update(
+        db_session=db_session,
+        customer_id=customer_id,
+        new_info=payload,
+        current_user=current_user,
+    )
+    return Response(status_code=HTTPStatus.NO_CONTENT.value)
 
 
 @api_customers.delete(
@@ -123,16 +135,20 @@ def update(
         HTTPStatus.FORBIDDEN: {"description": messages.USER_NOT_PERMISSION},
         HTTPStatus.NOT_FOUND: {"description": messages.CUSTOMER_NOT_FOUND},
     },
+    dependencies=[Depends(check_authenticated)],
 )
 def delete(
         *,
         db_session: Session = Depends(get_db),
-        customer_repository: CustomerRepository = Depends(di_customer_repository),
+        customer_repository: CustomerRepository = Depends(get_customer_repository),
+        current_user: User = Depends(get_current_user),
         customer: Customer = Depends(get_customer_by_id),
         customer_id: str,
 ) -> None:
-    return customer_repository.update(
+    customer_repository.update(
         db_session=db_session,
         customer_id=customer_id,
         new_info=CustomerUpdate(dt_deleted=datetime.utcnow()),
+        current_user=current_user,
     )
+    return Response(status_code=HTTPStatus.NO_CONTENT.value)

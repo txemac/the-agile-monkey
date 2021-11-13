@@ -6,7 +6,9 @@ from typing import Optional
 from sqlalchemy.orm import Session
 
 from customer.domain.customer import Customer
+from customer.domain.customer import CustomerCreate
 from customer.domain.customer import CustomerUpdate
+from user.domain.user import User
 
 
 class CustomerRepository(ABC):
@@ -30,14 +32,16 @@ class CustomerRepository(ABC):
     def create(
             cls,
             db_session: Session,
-            customer: Customer,
-    ) -> bool:
+            customer: CustomerCreate,
+            current_user: User,
+    ) -> Optional[Customer]:
         """
         Persist a new Customer.
 
         :param db_session: session of the database
         :param customer: Customer to persist
-        :return: True if the record was created, False otherwise
+        :param current_user: current user
+        :return: customer
         """
         pass
 
@@ -48,14 +52,15 @@ class CustomerRepository(ABC):
             db_session: Session,
             customer_id: str,
             new_info: CustomerUpdate,
+            current_user: User,
     ) -> None:
         """
-        Persist a new Customer.
+        Update the info of a customer.
 
         :param db_session: session of the database
         :param customer_id: customer's ID
         :param new_info: new info
-        :return: True if the record was created, False otherwise
+        :param current_user: current user
         """
         pass
 
