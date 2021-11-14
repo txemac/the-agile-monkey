@@ -1,3 +1,4 @@
+import logging
 from http import HTTPStatus
 
 from fastapi import Depends
@@ -9,6 +10,8 @@ from customer.domain.customer import Customer
 from customer.domain.customer_repository import CustomerRepository
 from database import get_db
 from depends import get_customer_repository
+
+logger = logging.getLogger(__name__)
 
 
 def get_customer_by_id(
@@ -29,6 +32,7 @@ def get_customer_by_id(
     customer_db = customer_repository.get_by_id(db_session=db_session, customer_id=customer_id)
 
     if customer_db is None:
+        logger.exception(f"{messages.CUSTOMER_NOT_FOUND} - ID: {customer_id}")
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail=messages.CUSTOMER_NOT_FOUND)
 
     return customer_db

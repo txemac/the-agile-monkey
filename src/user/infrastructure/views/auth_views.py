@@ -1,3 +1,4 @@
+import logging
 from http import HTTPStatus
 
 from fastapi import APIRouter
@@ -15,6 +16,8 @@ from user.security import create_access_token
 from user.security import verify_password
 
 api_auth = APIRouter()
+
+logger = logging.getLogger(__name__)
 
 
 @api_auth.post(
@@ -34,9 +37,11 @@ def generate_token(
     user_db = user_repository.get_by_username(db_session=db_session, username=payload.username)
 
     if not user_db or user_db.dt_deleted:
+        logger.exception(f"{messages.USER_NOT_FOUND} - username: {payload.username}")
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail=messages.USER_NOT_FOUND)
 
     if not verify_password(plain_password=payload.password, hashed_password=user_db.password):
+        logger.exception(f"{messages.USER_INCORRECT_USERNAME_PASSWORD} - username: {payload.username}")
         raise HTTPException(status_code=HTTPStatus.BAD_REQUEST, detail=messages.USER_INCORRECT_USERNAME_PASSWORD)
 
     return AuthToken(

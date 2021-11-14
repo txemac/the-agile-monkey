@@ -1,5 +1,6 @@
 import base64
 import binascii
+import logging
 from http import HTTPStatus
 
 import boto3
@@ -8,6 +9,8 @@ from fastapi import HTTPException
 import messages
 import settings
 from customer.domain.image_storage_service import ImageStorageService
+
+logger = logging.getLogger(__name__)
 
 
 class AWSS3ImageStorageService(ImageStorageService):
@@ -28,6 +31,8 @@ class AWSS3ImageStorageService(ImageStorageService):
         try:
             image_binary = base64.b64decode(image)
         except binascii.Error:
+            logger.exception(messages.IMAGE_BASE64_NOT_VALID)
             raise HTTPException(status_code=HTTPStatus.BAD_REQUEST, detail=messages.IMAGE_BASE64_NOT_VALID)
 
         s3_client.Object(settings.BUCKET, path).put(Body=image_binary, ContentType="image/jpeg")
+        logger.info("Photo uploaded.")

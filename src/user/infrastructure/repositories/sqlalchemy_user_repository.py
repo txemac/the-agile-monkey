@@ -1,3 +1,4 @@
+import logging
 from datetime import datetime
 from typing import List
 from typing import Optional
@@ -14,6 +15,8 @@ from user.domain.user import UserUpdate
 from user.domain.user_repository import UserRepository
 from user.infrastructure.models.sqlalchemy_user import SQLAlchemyUser
 from user.security import get_password_hash
+
+logger = logging.getLogger(__name__)
 
 
 class SQLAlchemyUserRepository(UserRepository):
@@ -40,6 +43,7 @@ class SQLAlchemyUserRepository(UserRepository):
         user_to_save.dt_deleted = None
         user_to_save.is_admin = user.is_admin
         created = save(db_session=db_session, obj=user_to_save)
+        logger.info(f"User with ID \"{user_to_save.id}\" created.")
         return user_to_save if created else None
 
     @classmethod
@@ -56,6 +60,7 @@ class SQLAlchemyUserRepository(UserRepository):
             setattr(user_db, key, value)
         user_db.dt_updated = datetime.utcnow()
         commit(db_session=db_session)
+        logger.info(f"User with ID \"{user_id}\" updated.")
 
     @classmethod
     def get_by_id(

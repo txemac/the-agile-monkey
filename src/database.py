@@ -1,3 +1,4 @@
+import logging
 import os
 from typing import Any
 
@@ -5,6 +6,8 @@ from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import Session
 from sqlalchemy.orm import sessionmaker
+
+logger = logging.getLogger(__name__)
 
 engine = create_engine(os.getenv("DATABASE_URL"))
 
@@ -35,7 +38,7 @@ def save(
         db_session.refresh(obj)
         return True
     except Exception as e:
-        print(str(e))
+        logger.exception(str(e))
         db_session.rollback()
         return False
 
@@ -50,6 +53,6 @@ def commit(
         db_session.commit()
         return True
     except Exception as e:
-        print(str(e))
+        logger.exception(str(e))
         db_session.rollback()
         return False

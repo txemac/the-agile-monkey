@@ -1,3 +1,4 @@
+import logging
 from datetime import datetime
 from typing import List
 from typing import Optional
@@ -12,6 +13,8 @@ from customer.infrastructure.models.sqlalchemy_customer import SQLAlchemyCustome
 from database import commit
 from database import save
 from user.domain.user import User
+
+logger = logging.getLogger(__name__)
 
 
 class SQLAlchemyCustomerRepository(CustomerRepository):
@@ -41,6 +44,7 @@ class SQLAlchemyCustomerRepository(CustomerRepository):
         customer_to_save.created_by_id = current_user.id
         customer_to_save.updated_by = None
         created = save(db_session=db_session, obj=customer_to_save)
+        logger.info(f"Customer with ID \"{customer.id}\" created.")
         return customer_to_save if created else None
 
     @classmethod
@@ -57,6 +61,7 @@ class SQLAlchemyCustomerRepository(CustomerRepository):
         customer_db.updated_by_id = current_user.id
         customer_db.dt_updated = datetime.utcnow()
         commit(db_session=db_session)
+        logger.info(f"Customer with ID \"{customer_id}\" updated.")
 
     @classmethod
     def get_by_id(

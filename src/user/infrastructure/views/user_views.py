@@ -1,3 +1,4 @@
+import logging
 from datetime import datetime
 from http import HTTPStatus
 from typing import List
@@ -22,6 +23,8 @@ from user.domain.user_repository import UserRepository
 
 api_users = APIRouter()
 
+logger = logging.getLogger(__name__)
+
 
 @api_users.post(
     path="",
@@ -44,6 +47,7 @@ def create(
     # check the unique username
     user_db = user_repository.get_by_username(db_session=db_session, username=payload.username)
     if user_db:
+        logger.exception(messages.USERNAME_ALREADY_EXISTS)
         raise HTTPException(status_code=HTTPStatus.BAD_REQUEST, detail=messages.USERNAME_ALREADY_EXISTS)
 
     # create new user

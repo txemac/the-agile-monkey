@@ -1,3 +1,4 @@
+import logging
 from datetime import datetime
 from http import HTTPStatus
 from typing import List
@@ -23,6 +24,8 @@ from user.domain.user import User
 
 api_customers = APIRouter()
 
+logger = logging.getLogger(__name__)
+
 
 @api_customers.post(
     path="",
@@ -46,6 +49,7 @@ def create(
     # check the unique id
     customer_db = customer_repository.get_by_id(db_session=db_session, customer_id=payload.id)
     if customer_db:
+        logger.exception(messages.CUSTOMER_ID_ALREADY_EXISTS)
         raise HTTPException(status_code=HTTPStatus.BAD_REQUEST, detail=messages.CUSTOMER_ID_ALREADY_EXISTS)
 
     # upload photo
@@ -58,6 +62,7 @@ def create(
     # create new customer
     new_customer = customer_repository.create(db_session=db_session, customer=payload, current_user=current_user)
     if not new_customer:
+        logger.exception(messages.CUSTOMER_CREATE_ERROR)
         raise HTTPException(status_code=HTTPStatus.BAD_REQUEST, detail=messages.CUSTOMER_CREATE_ERROR)
 
 

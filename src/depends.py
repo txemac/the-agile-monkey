@@ -1,3 +1,4 @@
+import logging
 from http import HTTPStatus
 from typing import Optional
 from uuid import UUID
@@ -22,6 +23,8 @@ from user.domain.auth import AuthTokenPayload
 from user.domain.user import User
 from user.domain.user_repository import UserRepository
 from user.infrastructure.repositories.sqlalchemy_user_repository import SQLAlchemyUserRepository
+
+logger = logging.getLogger(__name__)
 
 
 def get_user_repository() -> UserRepository:
@@ -53,7 +56,8 @@ def str_to_uuid(
         return None
     try:
         result = UUID(str(uuid))
-    except ValueError:
+    except ValueError as e:
+        logger.exception(str(e))
         raise HTTPException(status_code=HTTPStatus.BAD_REQUEST, detail=messages.UUID_NOT_VALID)
     return result
 
@@ -74,7 +78,8 @@ def get_current_user(
     try:
         payload = jwt.decode(token, settings.SECRET_KEY, algorithms=["HS256"])
         token_data = AuthTokenPayload(**payload)
-    except (JWTError, ValidationError):
+    except (JWTError, ValidationError) as e:
+        logger.exception(str(e))
         raise HTTPException(status_code=HTTPStatus.UNAUTHORIZED, detail=messages.USER_NOT_CREDENTIALS)
 
     user_db = user_repository.get_by_username(db_session=db_session, username=token_data.sub)
@@ -93,6 +98,7 @@ def check_authenticated(
     :param current_user: current user
     """
     if not current_user:
+        logger.exception(messages.USER_NOT_PERMISSION)
         raise HTTPException(status_code=HTTPStatus.FORBIDDEN, detail=messages.USER_NOT_PERMISSION)
 
 
@@ -105,6 +111,7 @@ def check_authenticated_is_admin(
     :param current_user: current user
     """
     if not current_user.is_admin:
+        logger.exception(messages.USER_NOT_PERMISSION)
         raise HTTPException(status_code=HTTPStatus.FORBIDDEN, detail=messages.USER_NOT_PERMISSION)
 
 
@@ -126,6 +133,7 @@ def get_customer_by_id(
     customer_db = customer_repository.get_by_id(db_session=db_session, customer_id=customer_id)
 
     if customer_db is None:
+        logger.exception(f"{messages.CUSTOMER_NOT_FOUND} - ID: {customer_id}")
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail=messages.CUSTOMER_NOT_FOUND)
 
     return customer_db
