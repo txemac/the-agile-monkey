@@ -2,6 +2,7 @@ from http import HTTPStatus
 from typing import Dict
 
 from fastapi import FastAPI
+from fastapi_pagination import add_pagination
 from starlette.middleware.cors import CORSMiddleware
 
 from customer.infrastructure.views.customer_views import api_customers
@@ -26,6 +27,8 @@ def create_app() -> FastAPI:
         allow_methods=["POST", "GET", "PATCH", "DELETE"],
         allow_headers=["*"],
     )
+
+    add_pagination(api)
 
     return api
 

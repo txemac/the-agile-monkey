@@ -1,13 +1,15 @@
 import logging
 from datetime import datetime
 from http import HTTPStatus
-from typing import List
 from typing import Optional
 
 from fastapi import APIRouter
 from fastapi import Depends
 from fastapi import HTTPException
 from fastapi import Response
+from fastapi_pagination import Page
+from fastapi_pagination import Params
+from fastapi_pagination import paginate
 from sqlalchemy.orm import Session
 
 import messages
@@ -61,7 +63,7 @@ def create(
 @api_users.get(
     path="",
     description="List all users. Only for admins.",
-    response_model=List[User],
+    response_model=Page[User],
     response_model_exclude={"password"},
     status_code=HTTPStatus.OK,
     responses={
@@ -75,14 +77,12 @@ def get_list(
         *,
         db_session: Session = Depends(get_db),
         user_repository: UserRepository = Depends(get_user_repository),
+        params: Params = Depends(),
         only_users: Optional[bool] = True,
         only_actives: Optional[bool] = True,
-) -> List[User]:
-    return user_repository.get_list(
-        db_session=db_session,
-        only_users=only_users,
-        only_actives=only_actives,
-    )
+) -> Page[User]:
+    users = user_repository.get_list(db_session, only_users=only_users, only_actives=only_actives)
+    return paginate(users, params)
 
 
 @api_users.patch(

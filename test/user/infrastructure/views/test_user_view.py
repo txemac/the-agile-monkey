@@ -11,7 +11,6 @@ from user.domain.user import User
 from user.domain.user import UserUpdate
 from user.domain.user_repository import UserRepository
 from utils import assert_dicts
-from utils import assert_lists
 
 
 def test_user_create_ok(
@@ -89,10 +88,16 @@ def test_user_get_list_only_users(
         headers=user_admin_headers,
     )
     assert response.status_code == HTTPStatus.OK
-    expected = [user_1.__dict__]
-    expected[0]["dt_created"] = "*"
-    expected[0].pop("password")
-    assert_lists(original=response.json(), expected=expected)
+    items = [user_1.__dict__]
+    items[0]["dt_created"] = "*"
+    items[0].pop("password")
+    expected = dict(
+        items=items,
+        page=1,
+        total=1,
+        size=50,
+    )
+    assert_dicts(original=response.json(), expected=expected)
 
 
 def test_user_get_list_only_actives(
@@ -109,10 +114,16 @@ def test_user_get_list_only_actives(
         headers=user_admin_headers,
     )
     assert response.status_code == HTTPStatus.OK
-    expected = [user_admin.__dict__]
-    expected[0]["dt_created"] = "*"
-    expected[0].pop("password")
-    assert_lists(original=response.json(), expected=expected)
+    items = [user_admin.__dict__]
+    items[0]["dt_created"] = "*"
+    items[0].pop("password")
+    expected = dict(
+        items=items,
+        page=1,
+        total=1,
+        size=50,
+    )
+    assert_dicts(original=response.json(), expected=expected)
 
 
 def test_user_get_list_all(
@@ -128,11 +139,17 @@ def test_user_get_list_all(
         headers=user_admin_headers,
     )
     assert response.status_code == HTTPStatus.OK
-    expected = [user_admin.__dict__, user_1.__dict__]
-    for element in expected:
-        element["dt_created"] = "*"
-        element.pop("password")
-    assert_lists(original=response.json(), expected=expected)
+    items = [user_admin.__dict__, user_1.__dict__]
+    for item in items:
+        item["dt_created"] = "*"
+        item.pop("password")
+    expected = dict(
+        items=items,
+        page=1,
+        total=2,
+        size=50,
+    )
+    assert_dicts(original=response.json(), expected=expected)
 
 
 def test_user_get_list_without_permissions(
