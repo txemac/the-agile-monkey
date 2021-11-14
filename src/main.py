@@ -2,6 +2,7 @@ from http import HTTPStatus
 from typing import Dict
 
 from fastapi import FastAPI
+from starlette.middleware.cors import CORSMiddleware
 
 from customer.infrastructure.views.customer_views import api_customers
 from main_schema import SchemaHealth
@@ -17,6 +18,14 @@ def create_app() -> FastAPI:
     api.include_router(api_auth, prefix="/auth", tags=["Auth"])
     api.include_router(api_users, prefix="/users", tags=["Users"])
     api.include_router(api_customers, prefix="/customers", tags=["Customers"])
+
+    api.add_middleware(
+        CORSMiddleware,
+        allow_origins=["*"],
+        allow_credentials=True,
+        allow_methods=["POST", "GET", "PATCH", "DELETE"],
+        allow_headers=["*"],
+    )
 
     return api
 
