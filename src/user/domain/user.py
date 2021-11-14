@@ -18,6 +18,15 @@ class User(UserCreate):
     dt_updated: datetime = None
     dt_deleted: datetime = None
 
+
+class UserOut(BaseModel):
+    id: UUID
+    username: constr(min_length=1)
+    is_admin: bool = False
+    dt_created: datetime
+    dt_updated: datetime = None
+    dt_deleted: datetime = None
+
     class Config:
         orm_mode = True
 

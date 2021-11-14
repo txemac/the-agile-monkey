@@ -20,6 +20,7 @@ from main_schema import SchemaID
 from user.depends import get_user_by_id
 from user.domain.user import User
 from user.domain.user import UserCreate
+from user.domain.user import UserOut
 from user.domain.user import UserUpdate
 from user.domain.user_repository import UserRepository
 
@@ -63,8 +64,7 @@ def create(
 @api_users.get(
     path="",
     description="List all users. Only for admins.",
-    response_model=Page[User],
-    response_model_exclude={"password"},
+    response_model=Page[UserOut],
     status_code=HTTPStatus.OK,
     responses={
         HTTPStatus.BAD_REQUEST: {"description": messages.USERNAME_ALREADY_EXISTS},
@@ -80,7 +80,7 @@ def get_list(
         params: Params = Depends(),
         only_users: Optional[bool] = True,
         only_actives: Optional[bool] = True,
-) -> Page[User]:
+) -> Page[UserOut]:
     users = user_repository.get_list(db_session, only_users=only_users, only_actives=only_actives)
     return paginate(users, params)
 
