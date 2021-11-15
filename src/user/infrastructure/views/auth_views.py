@@ -25,7 +25,7 @@ logger = logging.getLogger(__name__)
     status_code=HTTPStatus.OK,
     response_model=AuthToken,
     responses={
-        HTTPStatus.BAD_REQUEST: {"description": messages.USER_INCORRECT_USERNAME_PASSWORD}
+        400: {"description": messages.USER_INCORRECT_USERNAME_PASSWORD}
     },
 )
 def generate_token(

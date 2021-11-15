@@ -34,9 +34,9 @@ logger = logging.getLogger(__name__)
     description="Create a new customer.",
     status_code=HTTPStatus.CREATED,
     responses={
-        HTTPStatus.BAD_REQUEST: {"description": messages.CUSTOMER_ID_ALREADY_EXISTS},
-        HTTPStatus.UNAUTHORIZED: {"description": messages.USER_NOT_CREDENTIALS},
-        HTTPStatus.FORBIDDEN: {"description": messages.USER_NOT_PERMISSION},
+        400: {"description": messages.CUSTOMER_ID_ALREADY_EXISTS},
+        401: {"description": messages.USER_NOT_CREDENTIALS},
+        403: {"description": messages.USER_NOT_PERMISSION},
     },
     dependencies=[Depends(check_authenticated)],
 )
@@ -74,9 +74,9 @@ def create(
     response_model=Customer,
     status_code=HTTPStatus.OK,
     responses={
-        HTTPStatus.UNAUTHORIZED: {"description": messages.USER_NOT_CREDENTIALS},
-        HTTPStatus.FORBIDDEN: {"description": messages.USER_NOT_PERMISSION},
-        HTTPStatus.NOT_FOUND: {"description": messages.CUSTOMER_NOT_FOUND},
+        401: {"description": messages.USER_NOT_CREDENTIALS},
+        403: {"description": messages.USER_NOT_PERMISSION},
+        404: {"description": messages.CUSTOMER_NOT_FOUND},
     },
     dependencies=[Depends(check_authenticated)],
 )
@@ -93,9 +93,9 @@ def get_one(
     response_model=Page[Customer],
     status_code=HTTPStatus.OK,
     responses={
-        HTTPStatus.BAD_REQUEST: {"description": messages.USERNAME_ALREADY_EXISTS},
-        HTTPStatus.UNAUTHORIZED: {"description": messages.USER_NOT_CREDENTIALS},
-        HTTPStatus.FORBIDDEN: {"description": messages.USER_NOT_PERMISSION},
+        400: {"description": messages.USERNAME_ALREADY_EXISTS},
+        401: {"description": messages.USER_NOT_CREDENTIALS},
+        403: {"description": messages.USER_NOT_PERMISSION},
     },
     dependencies=[Depends(check_authenticated)],
 )
@@ -115,10 +115,10 @@ def get_list(
     description="Update customer.",
     status_code=HTTPStatus.NO_CONTENT,
     responses={
-        HTTPStatus.BAD_REQUEST: {"description": messages.UUID_NOT_VALID},
-        HTTPStatus.UNAUTHORIZED: {"description": messages.USER_NOT_CREDENTIALS},
-        HTTPStatus.FORBIDDEN: {"description": messages.USER_NOT_PERMISSION},
-        HTTPStatus.NOT_FOUND: {"description": messages.CUSTOMER_NOT_FOUND},
+        400: {"description": messages.UUID_NOT_VALID},
+        401: {"description": messages.USER_NOT_CREDENTIALS},
+        403: {"description": messages.USER_NOT_PERMISSION},
+        404: {"description": messages.CUSTOMER_NOT_FOUND},
     },
     dependencies=[Depends(check_authenticated)],
 )
@@ -153,9 +153,9 @@ def update(
     description="Deactivate a customer.",
     status_code=HTTPStatus.NO_CONTENT,
     responses={
-        HTTPStatus.UNAUTHORIZED: {"description": messages.USER_NOT_CREDENTIALS},
-        HTTPStatus.FORBIDDEN: {"description": messages.USER_NOT_PERMISSION},
-        HTTPStatus.NOT_FOUND: {"description": messages.CUSTOMER_NOT_FOUND},
+        401: {"description": messages.USER_NOT_CREDENTIALS},
+        403: {"description": messages.USER_NOT_PERMISSION},
+        404: {"description": messages.CUSTOMER_NOT_FOUND},
     },
     dependencies=[Depends(check_authenticated)],
 )

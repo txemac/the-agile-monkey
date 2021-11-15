@@ -35,9 +35,9 @@ logger = logging.getLogger(__name__)
     status_code=HTTPStatus.CREATED,
     response_model=SchemaID,
     responses={
-        HTTPStatus.BAD_REQUEST: {"description": messages.USERNAME_ALREADY_EXISTS},
-        HTTPStatus.UNAUTHORIZED: {"description": messages.USER_NOT_CREDENTIALS},
-        HTTPStatus.FORBIDDEN: {"description": messages.USER_NOT_PERMISSION},
+        400: {"description": messages.USERNAME_ALREADY_EXISTS},
+        401: {"description": messages.USER_NOT_CREDENTIALS},
+        403: {"description": messages.USER_NOT_PERMISSION},
     },
     dependencies=[Depends(check_authenticated_is_admin)],
 )
@@ -67,9 +67,9 @@ def create(
     response_model=Page[UserOut],
     status_code=HTTPStatus.OK,
     responses={
-        HTTPStatus.BAD_REQUEST: {"description": messages.USERNAME_ALREADY_EXISTS},
-        HTTPStatus.UNAUTHORIZED: {"description": messages.USER_NOT_CREDENTIALS},
-        HTTPStatus.FORBIDDEN: {"description": messages.USER_NOT_PERMISSION},
+        400: {"description": messages.USERNAME_ALREADY_EXISTS},
+        401: {"description": messages.USER_NOT_CREDENTIALS},
+        403: {"description": messages.USER_NOT_PERMISSION},
     },
     dependencies=[Depends(check_authenticated_is_admin)],
 )
@@ -90,10 +90,10 @@ def get_list(
     description="Update user. Only for admins.",
     status_code=HTTPStatus.NO_CONTENT,
     responses={
-        HTTPStatus.BAD_REQUEST: {"description": messages.UUID_NOT_VALID},
-        HTTPStatus.UNAUTHORIZED: {"description": messages.USER_NOT_CREDENTIALS},
-        HTTPStatus.FORBIDDEN: {"description": messages.USER_NOT_PERMISSION},
-        HTTPStatus.NOT_FOUND: {"description": messages.USER_NOT_FOUND},
+        400: {"description": messages.UUID_NOT_VALID},
+        401: {"description": messages.USER_NOT_CREDENTIALS},
+        403: {"description": messages.USER_NOT_PERMISSION},
+        404: {"description": messages.USER_NOT_FOUND},
     },
     dependencies=[Depends(check_authenticated_is_admin)],
 )
@@ -113,10 +113,10 @@ def update(
     description="Deactivate user. Only for admins.",
     status_code=HTTPStatus.NO_CONTENT,
     responses={
-        HTTPStatus.BAD_REQUEST: {"description": messages.UUID_NOT_VALID},
-        HTTPStatus.UNAUTHORIZED: {"description": messages.USER_NOT_CREDENTIALS},
-        HTTPStatus.FORBIDDEN: {"description": messages.USER_NOT_PERMISSION},
-        HTTPStatus.NOT_FOUND: {"description": messages.USER_NOT_FOUND},
+        400: {"description": messages.UUID_NOT_VALID},
+        401: {"description": messages.USER_NOT_CREDENTIALS},
+        403: {"description": messages.USER_NOT_PERMISSION},
+        404: {"description": messages.USER_NOT_FOUND},
     },
     dependencies=[Depends(check_authenticated_is_admin)],
 )
