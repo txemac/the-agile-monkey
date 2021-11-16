@@ -24,8 +24,6 @@ from user.domain.user_repository import UserRepository
 from user.infrastructure.repositories.sqlalchemy_user_repository import SQLAlchemyUserRepository
 from user.security import create_access_token
 
-_db_conn = create_engine(settings.DATABASE_URL)
-
 
 @pytest.fixture
 def client(
@@ -55,7 +53,7 @@ def migrations(
         engine: Engine,
 ) -> None:
     root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    alembic_ini = os.path.join(root_dir, "src", "alembic.ini")
+    alembic_ini = os.path.join(root_dir, "alembic.ini")
     config = Config(alembic_ini)
     upgrade(config, "head")
     yield

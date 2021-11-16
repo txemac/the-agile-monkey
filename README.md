@@ -92,6 +92,12 @@ pytest -vvv
 
 ### Docker
 
+Help:
+
+```shell script
+make
+```
+
 Build:
 
 ```shell script
@@ -110,10 +116,28 @@ Database migrate:
 make migrate-up
 ```
 
+Test:
+
+```shell script
+make pytest
+```
+
+Down:
+
+```shell script
+make down
+```
+
 Stop:
 
 ```shell script
 make stop
+```
+
+Delete:
+
+```shell script
+make rm
 ```
 
 Check the API with http://127.0.0.1:8000/health

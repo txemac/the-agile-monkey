@@ -7,9 +7,10 @@ WORKDIR /usr/src/app
 # set environment variables
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
+ENV PYTHONPATH "${PYTHONPATH}:src:test"
 
 # copy project
-COPY src /usr/src/app/
+COPY . /usr/src/app/
 
 # install dependencies
 RUN set -eux \
@@ -17,5 +18,6 @@ RUN set -eux \
         libressl-dev libffi-dev gcc musl-dev python3-dev \
         postgresql-dev \
     && pip install --upgrade pip setuptools wheel \
-    && pip install -r /usr/src/app/requirements.txt \
+    && pip install -r /usr/src/app/src/requirements.txt \
+    && pip install -r /usr/src/app/test/requirements.txt \
     && rm -rf /root/.cache/pip

@@ -17,9 +17,7 @@ fileConfig(config.config_file_name)
 # for 'autogenerate' support
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
-from database import Base  # noqa: E402
-
-target_metadata = Base.metadata
+target_metadata = None
 
 
 # other values from the config, defined by the needs of env.py,
@@ -45,8 +43,7 @@ def run_migrations_offline():
 
     """
     url = get_url()
-    context.configure(
-        url=url, target_metadata=target_metadata, literal_binds=True)
+    context.configure(url=url, literal_binds=True)
 
     with context.begin_transaction():
         context.run_migrations()

@@ -1,5 +1,4 @@
 import logging
-import os
 from typing import Any
 
 from sqlalchemy import create_engine
@@ -7,9 +6,11 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import Session
 from sqlalchemy.orm import sessionmaker
 
+import settings
+
 logger = logging.getLogger(__name__)
 
-engine = create_engine(os.getenv("DATABASE_URL"))
+engine = create_engine(settings.DATABASE_URL)
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
