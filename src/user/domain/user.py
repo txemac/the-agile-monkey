@@ -34,7 +34,6 @@ class UserOut(BaseModel):
             example=dict(
                 id="f05acf11-ef44-4e9c-95ea-7699f5fe2d34",
                 username="monkey",
-                password="hashed password",
                 dt_created="2021-11-11 12:34:56",
                 dt_updated=None,
                 dt_deleted=None,

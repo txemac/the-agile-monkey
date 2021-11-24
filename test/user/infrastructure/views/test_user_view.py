@@ -219,6 +219,29 @@ def test_user_update_user_id_not_exists(
     assert response.json()["detail"] == messages.USER_NOT_FOUND
 
 
+def test_user_update_username_already_exists(
+        client: TestClient,
+        user_admin_headers: Dict,
+        db_session: Session,
+        user_repository: UserRepository,
+        user_admin: User,
+        user_1: User,
+) -> None:
+    data = dict(
+        username=user_admin.username,
+        password="new_password",
+        is_admin=True,
+        dt_deleted="2021-11-11T12:34:56",
+    )
+    response = client.patch(
+        url=f"/users/{user_1.id}",
+        json=data,
+        headers=user_admin_headers,
+    )
+    assert response.status_code == HTTPStatus.BAD_REQUEST
+    assert response.json()["detail"] == messages.USERNAME_ALREADY_EXISTS
+
+
 def test_user_update_user_id_not_valid(
         client: TestClient,
         user_admin_headers: Dict,

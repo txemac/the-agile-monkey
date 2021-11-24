@@ -104,6 +104,12 @@ def update(
         user: User = Depends(get_user_by_id),
         payload: UserUpdate,
 ) -> None:
+    # check the unique username
+    user_db = user_repository.get_by_username(db_session=db_session, username=payload.username)
+    if user_db:
+        logger.exception(messages.USERNAME_ALREADY_EXISTS)
+        raise HTTPException(status_code=HTTPStatus.BAD_REQUEST, detail=messages.USERNAME_ALREADY_EXISTS)
+
     user_repository.update(db_session, user_id=user.id, new_info=payload)
     return Response(status_code=HTTPStatus.NO_CONTENT.value)
 
